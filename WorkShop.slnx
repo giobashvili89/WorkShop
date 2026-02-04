@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WorkShop.API/WorkShop.API.csproj" />
+    <Project Path="src/WorkShop.Application/WorkShop.Application.csproj" />
+    <Project Path="src/WorkShop.Domain/WorkShop.Domain.csproj" />
+    <Project Path="src/WorkShop.Infrastructure/WorkShop.Infrastructure.csproj" />
+  </Folder>
+</Solution>
