@@ -4,5 +4,6 @@
     <Project Path="src/WorkShop.Application/WorkShop.Application.csproj" />
     <Project Path="src/WorkShop.Domain/WorkShop.Domain.csproj" />
     <Project Path="src/WorkShop.Infrastructure/WorkShop.Infrastructure.csproj" />
+    <Project Path="src/WorkShop.API.Tests/WorkShop.API.Tests.csproj" />
   </Folder>
 </Solution>
