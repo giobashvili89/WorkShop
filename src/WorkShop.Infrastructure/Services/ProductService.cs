@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
 

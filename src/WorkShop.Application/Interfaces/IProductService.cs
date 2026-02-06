@@ -1,4 +1,4 @@
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 
 namespace WorkShop.Application.Interfaces;
 
