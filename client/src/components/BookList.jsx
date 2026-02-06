@@ -35,6 +35,13 @@ function BookList() {
 
   const addToCart = (book) => {
     const existingItem = cart.find(item => item.bookId === book.id);
+    const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+    
+    if (currentQuantityInCart >= book.stockQuantity) {
+      alert('Cannot add more items than available in stock');
+      return;
+    }
+    
     if (existingItem) {
       setCart(cart.map(item => 
         item.bookId === book.id 
@@ -54,6 +61,12 @@ function BookList() {
     if (newQuantity < 1) {
       removeFromCart(bookId);
     } else {
+      const cartItem = cart.find(item => item.bookId === bookId);
+      if (cartItem && newQuantity > cartItem.book.stockQuantity) {
+        alert('Cannot exceed available stock quantity');
+        return;
+      }
+      
       setCart(cart.map(item => 
         item.bookId === bookId 
           ? { ...item, quantity: newQuantity }

@@ -59,7 +59,7 @@ public static class DbInitializer
                 Description = $"This is a comprehensive {category.ToLower()} book written by {author}. " +
                              $"It covers various aspects of {category.ToLower()} and provides valuable insights. " +
                              $"Published in {publishedYear}, this work has been influential in its field.",
-                ISBN = $"978-{random.Next(1000000000, 2000000000)}",
+                ISBN = $"978-{random.Next(1000000000, 2000000000)}", // Mock ISBN for demo purposes
                 Price = Math.Round((decimal)(random.NextDouble() * 50 + 9.99), 2), // Price between $9.99 and $59.99
                 StockQuantity = random.Next(10, 100), // Stock between 10 and 100
                 SoldCount = 0,

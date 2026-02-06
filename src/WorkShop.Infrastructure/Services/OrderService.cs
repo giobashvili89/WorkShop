@@ -190,7 +190,7 @@ public class OrderService : IOrderService
             foreach (var item in order.OrderItems)
             {
                 item.Book.StockQuantity += item.Quantity;
-                item.Book.SoldCount -= item.Quantity;
+                item.Book.SoldCount = Math.Max(0, item.Book.SoldCount - item.Quantity);
             }
 
             order.Status = "Cancelled";
