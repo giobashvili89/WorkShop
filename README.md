@@ -83,6 +83,22 @@ Build the React client image:
 docker build -t workshop-client -f client/Dockerfile ./client
 ```
 
+> **Note**: If you encounter npm timeout issues during Docker build in restricted network environments, you may need to:
+> - Build with `--network=host` flag
+> - Pre-download dependencies locally before building
+> - Use a local npm registry mirror
+
+#### Docker Environment Variables
+
+The `docker-compose.yml` file includes default environment variables. For production, create a `.env` file:
+
+```env
+POSTGRES_DB=workshop_db
+POSTGRES_USER=your_user
+POSTGRES_PASSWORD=your_secure_password
+JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
+```
+
 ### Option 2: Running Locally
 
 #### Database Setup
@@ -166,6 +182,7 @@ docker build -t workshop-client -f client/Dockerfile ./client
 - **Clean Architecture**: The backend follows clean architecture principles with clear separation of concerns
 - **JWT Authentication**: Secure API endpoints with JSON Web Tokens
 - **PostgreSQL Database**: Persistent data storage with Entity Framework Core
+- **Docker Support**: Complete Docker and Docker Compose configuration for easy deployment
 - **Secure Password Hashing**: Using PBKDF2 with SHA256, 100,000 iterations, and random salts for password security
 - **Book Management**: Full CRUD operations for books with filtering by author and category
 - **User Authentication**: Registration and login with secure password hashing
@@ -176,6 +193,11 @@ docker build -t workshop-client -f client/Dockerfile ./client
 - **Unit Tests**: Comprehensive test coverage with xUnit
 
 ## Technologies Used
+
+### DevOps & Deployment
+- Docker & Docker Compose
+- Multi-stage builds for optimized images
+- PostgreSQL 16 Alpine for database
 
 ### Backend
 - .NET 10
