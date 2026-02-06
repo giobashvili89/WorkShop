@@ -8,13 +8,11 @@ public static class DbInitializer
 {
     public static async Task InitializeAsync(AppDbContext context)
     {
-        // Ensure database is created
-        // Note: EnsureCreatedAsync() is used for simplicity in development.
-        // For production, consider using Migrations with MigrateAsync() instead.
-        await context.Database.EnsureCreatedAsync();
+        // Apply any pending migrations
+        await context.Database.MigrateAsync();
 
-        // Check if data already exists
-        if (await context.Books.AnyAsync() || await context.Users.AnyAsync())
+        // Check if data already exists (after migrations are applied)
+        if (await context.Books.AnyAsync())
         {
             return; // Database has been seeded
         }

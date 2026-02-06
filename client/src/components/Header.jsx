@@ -13,10 +13,10 @@ function Header({ onLogout, currentView, setCurrentView }) {
             <nav className="flex space-x-4">
               <button
                 onClick={() => setCurrentView('books')}
-                className={`px-4 py-2 rounded-lg transition ${
+                className={`px-4 py-2 rounded-lg transition text-white ${
                   currentView === 'books'
                     ? 'bg-blue-700'
-                    : 'hover:bg-blue-500'
+                    : 'bg-blue-600 hover:bg-blue-500'
                 }`}
               >
                 Browse Books
@@ -24,10 +24,10 @@ function Header({ onLogout, currentView, setCurrentView }) {
               {isAdmin && (
                 <button
                   onClick={() => setCurrentView('admin')}
-                  className={`px-4 py-2 rounded-lg transition ${
+                  className={`px-4 py-2 rounded-lg transition text-white ${
                     currentView === 'admin'
                       ? 'bg-blue-700'
-                      : 'hover:bg-blue-500'
+                      : 'bg-blue-600 hover:bg-blue-500'
                   }`}
                 >
                   Manage Books
@@ -35,10 +35,10 @@ function Header({ onLogout, currentView, setCurrentView }) {
               )}
               <button
                 onClick={() => setCurrentView('orders')}
-                className={`px-4 py-2 rounded-lg transition ${
+                className={`px-4 py-2 rounded-lg transition text-white ${
                   currentView === 'orders'
                     ? 'bg-blue-700'
-                    : 'hover:bg-blue-500'
+                    : 'bg-blue-600 hover:bg-blue-500'
                 }`}
               >
                 My Orders
