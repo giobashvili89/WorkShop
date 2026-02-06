@@ -3,6 +3,10 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: workshop-postgres
+    command: 
+      - "postgres"
+      - "-c"
+      - "listen_addresses=*"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-workshop_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -27,7 +31,7 @@ services:
     container_name: workshop-api
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-workshop_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-workshop_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-gio}
       - Jwt__Secret=${JWT_SECRET:-YourSuperSecretKeyForJWTTokenGeneration12345}
       - Jwt__Issuer=${JWT_ISSUER:-WorkShopAPI}
       - Jwt__Audience=${JWT_AUDIENCE:-WorkShopClient}
