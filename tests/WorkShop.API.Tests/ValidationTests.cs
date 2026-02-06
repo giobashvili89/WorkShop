@@ -1,7 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
-using WorkShop.Application.Models;
+using WorkShop.Application.Models.Request;
+using WorkShop.Application.Models.Response;
 
 namespace WorkShop.API.Tests;
 

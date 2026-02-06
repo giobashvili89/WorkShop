@@ -1,4 +1,4 @@
-namespace WorkShop.Application.Models;
+namespace WorkShop.Application.Models.Response;
 
 public class AuthResponseModel
 {

@@ -1,5 +1,5 @@
 using FluentValidation;
-using WorkShop.Application.Models;
+using WorkShop.Application.Models.Request;
 
 namespace WorkShop.Application.Validators;
 

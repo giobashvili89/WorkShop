@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using WorkShop.Application.Models;
+using WorkShop.Application.Models.Request;
+using WorkShop.Application.Models.Response;
 using WorkShop.Application.Interfaces;
 
 namespace WorkShop.API.Controllers;

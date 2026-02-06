@@ -1,4 +1,4 @@
-namespace WorkShop.Application.Models;
+namespace WorkShop.Application.Models.Request;
 
 public class BookRequestModel
 {

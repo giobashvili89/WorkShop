@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using WorkShop.Application.Models;
+using WorkShop.Application.Models.Request;
+using WorkShop.Application.Models.Response;
 using WorkShop.Domain.Entities;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
