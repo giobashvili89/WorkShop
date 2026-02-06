@@ -1,9 +1,9 @@
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 
 namespace WorkShop.Application.Interfaces;
 
 public interface IAuthService
 {
-    Task<AuthResponseDto?> RegisterAsync(RegisterDto registerDto);
-    Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
+    Task<AuthResponseModel?> RegisterAsync(RegisterRequestModel registerDto);
+    Task<AuthResponseModel?> LoginAsync(LoginRequestModel loginDto);
 }

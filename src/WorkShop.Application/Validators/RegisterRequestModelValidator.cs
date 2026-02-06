@@ -1,11 +1,11 @@
 using FluentValidation;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 
 namespace WorkShop.Application.Validators;
 
-public class RegisterDtoValidator : AbstractValidator<RegisterDto>
+public class RegisterRequestModelValidator : AbstractValidator<RegisterRequestModel>
 {
-    public RegisterDtoValidator()
+    public RegisterRequestModelValidator()
     {
         RuleFor(x => x.Username)
             .NotEmpty().WithMessage("Username is required.")

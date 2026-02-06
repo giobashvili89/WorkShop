@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
 using WorkShop.Infrastructure.Data;
@@ -15,10 +15,10 @@ public class BookService : IBookService
         _context = context;
     }
 
-    public async Task<IEnumerable<BookDto>> GetAllBooksAsync()
+    public async Task<IEnumerable<BookResponseModel>> GetAllBooksAsync()
     {
         var books = await _context.Books.ToListAsync();
-        return books.Select(b => new BookDto
+        return books.Select(b => new BookResponseModel
         {
             Id = b.Id,
             Title = b.Title,
@@ -29,13 +29,13 @@ public class BookService : IBookService
         });
     }
 
-    public async Task<BookDto?> GetBookByIdAsync(int id)
+    public async Task<BookResponseModel?> GetBookByIdAsync(int id)
     {
         var book = await _context.Books.FindAsync(id);
         if (book == null)
             return null;
 
-        return new BookDto
+        return new BookResponseModel
         {
             Id = book.Id,
             Title = book.Title,
@@ -46,13 +46,13 @@ public class BookService : IBookService
         };
     }
 
-    public async Task<IEnumerable<BookDto>> GetBooksByAuthorAsync(string author)
+    public async Task<IEnumerable<BookResponseModel>> GetBooksByAuthorAsync(string author)
     {
         var books = await _context.Books
             .Where(b => b.Author.ToLower().Contains(author.ToLower()))
             .ToListAsync();
 
-        return books.Select(b => new BookDto
+        return books.Select(b => new BookResponseModel
         {
             Id = b.Id,
             Title = b.Title,
@@ -63,13 +63,13 @@ public class BookService : IBookService
         });
     }
 
-    public async Task<IEnumerable<BookDto>> GetBooksByCategoryAsync(string category)
+    public async Task<IEnumerable<BookResponseModel>> GetBooksByCategoryAsync(string category)
     {
         var books = await _context.Books
             .Where(b => b.Category.ToLower().Contains(category.ToLower()))
             .ToListAsync();
 
-        return books.Select(b => new BookDto
+        return books.Select(b => new BookResponseModel
         {
             Id = b.Id,
             Title = b.Title,
@@ -80,7 +80,7 @@ public class BookService : IBookService
         });
     }
 
-    public async Task<BookDto> CreateBookAsync(BookDto bookDto)
+    public async Task<BookResponseModel> CreateBookAsync(BookRequestModel bookDto)
     {
         var book = new Book
         {
@@ -95,11 +95,18 @@ public class BookService : IBookService
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
-        bookDto.Id = book.Id;
-        return bookDto;
+        return new BookResponseModel
+        {
+            Id = book.Id,
+            Title = book.Title,
+            Author = book.Author,
+            Category = book.Category,
+            Description = book.Description,
+            PublishedDate = book.PublishedDate
+        };
     }
 
-    public async Task<BookDto?> UpdateBookAsync(int id, BookDto bookDto)
+    public async Task<BookResponseModel?> UpdateBookAsync(int id, BookRequestModel bookDto)
     {
         var book = await _context.Books.FindAsync(id);
         if (book == null)
@@ -113,8 +120,15 @@ public class BookService : IBookService
 
         await _context.SaveChangesAsync();
 
-        bookDto.Id = id;
-        return bookDto;
+        return new BookResponseModel
+        {
+            Id = book.Id,
+            Title = book.Title,
+            Author = book.Author,
+            Category = book.Category,
+            Description = book.Description,
+            PublishedDate = book.PublishedDate
+        };
     }
 
     public async Task<bool> DeleteBookAsync(int id)

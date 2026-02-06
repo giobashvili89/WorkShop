@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Domain.Entities;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
@@ -38,7 +38,7 @@ public class AuthServiceTests
         var context = GetInMemoryDbContext();
         var configuration = GetConfiguration();
         var service = new AuthService(context, configuration);
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "testuser",
             Email = "test@example.com",
@@ -72,7 +72,7 @@ public class AuthServiceTests
         await context.SaveChangesAsync();
 
         var service = new AuthService(context, configuration);
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "existinguser",
             Email = "newemail@example.com",
@@ -102,7 +102,7 @@ public class AuthServiceTests
         await context.SaveChangesAsync();
 
         var service = new AuthService(context, configuration);
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "newuser",
             Email = "existing@example.com",
@@ -125,7 +125,7 @@ public class AuthServiceTests
         var service = new AuthService(context, configuration);
 
         // First register a user
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "testuser",
             Email = "test@example.com",
@@ -133,7 +133,7 @@ public class AuthServiceTests
         };
         await service.RegisterAsync(registerDto);
 
-        var loginDto = new LoginDto
+        var loginDto = new LoginRequestModel
         {
             Username = "testuser",
             Password = "password123"
@@ -156,7 +156,7 @@ public class AuthServiceTests
         var configuration = GetConfiguration();
         var service = new AuthService(context, configuration);
 
-        var loginDto = new LoginDto
+        var loginDto = new LoginRequestModel
         {
             Username = "nonexistentuser",
             Password = "password123"
@@ -178,7 +178,7 @@ public class AuthServiceTests
         var service = new AuthService(context, configuration);
 
         // First register a user
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "testuser",
             Email = "test@example.com",
@@ -186,7 +186,7 @@ public class AuthServiceTests
         };
         await service.RegisterAsync(registerDto);
 
-        var loginDto = new LoginDto
+        var loginDto = new LoginRequestModel
         {
             Username = "testuser",
             Password = "wrongpassword"

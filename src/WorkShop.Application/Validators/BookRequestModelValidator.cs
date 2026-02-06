@@ -1,11 +1,11 @@
 using FluentValidation;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 
 namespace WorkShop.Application.Validators;
 
-public class BookDtoValidator : AbstractValidator<BookDto>
+public class BookRequestModelValidator : AbstractValidator<BookRequestModel>
 {
-    public BookDtoValidator()
+    public BookRequestModelValidator()
     {
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")

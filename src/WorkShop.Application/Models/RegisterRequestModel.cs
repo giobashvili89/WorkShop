@@ -1,6 +1,6 @@
-namespace WorkShop.Application.DTOs;
+namespace WorkShop.Application.Models;
 
-public class RegisterDto
+public class RegisterRequestModel
 {
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Application.Interfaces;
 
 namespace WorkShop.API.Controllers;
@@ -18,14 +18,14 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<BookDto>>> GetAllBooks()
+    public async Task<ActionResult<IEnumerable<BookResponseModel>>> GetAllBooks()
     {
         var books = await _bookService.GetAllBooksAsync();
         return Ok(books);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<BookDto>> GetBook(int id)
+    public async Task<ActionResult<BookResponseModel>> GetBook(int id)
     {
         var book = await _bookService.GetBookByIdAsync(id);
         if (book == null)
@@ -34,28 +34,28 @@ public class BooksController : ControllerBase
     }
 
     [HttpGet("author/{author}")]
-    public async Task<ActionResult<IEnumerable<BookDto>>> GetBooksByAuthor(string author)
+    public async Task<ActionResult<IEnumerable<BookResponseModel>>> GetBooksByAuthor(string author)
     {
         var books = await _bookService.GetBooksByAuthorAsync(author);
         return Ok(books);
     }
 
     [HttpGet("category/{category}")]
-    public async Task<ActionResult<IEnumerable<BookDto>>> GetBooksByCategory(string category)
+    public async Task<ActionResult<IEnumerable<BookResponseModel>>> GetBooksByCategory(string category)
     {
         var books = await _bookService.GetBooksByCategoryAsync(category);
         return Ok(books);
     }
 
     [HttpPost]
-    public async Task<ActionResult<BookDto>> CreateBook([FromBody] BookDto bookDto)
+    public async Task<ActionResult<BookResponseModel>> CreateBook([FromBody] BookRequestModel bookDto)
     {
         var createdBook = await _bookService.CreateBookAsync(bookDto);
         return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, createdBook);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<BookDto>> UpdateBook(int id, [FromBody] BookDto bookDto)
+    public async Task<ActionResult<BookResponseModel>> UpdateBook(int id, [FromBody] BookRequestModel bookDto)
     {
         var updatedBook = await _bookService.UpdateBookAsync(id, bookDto);
         if (updatedBook == null)

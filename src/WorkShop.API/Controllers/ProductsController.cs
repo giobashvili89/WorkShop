@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Application.Interfaces;
 
 namespace WorkShop.API.Controllers;

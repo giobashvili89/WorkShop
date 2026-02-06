@@ -1,11 +1,11 @@
 using FluentValidation;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 
 namespace WorkShop.Application.Validators;
 
-public class LoginDtoValidator : AbstractValidator<LoginDto>
+public class LoginRequestModelValidator : AbstractValidator<LoginRequestModel>
 {
-    public LoginDtoValidator()
+    public LoginRequestModelValidator()
     {
         RuleFor(x => x.Username)
             .NotEmpty().WithMessage("Username is required.")

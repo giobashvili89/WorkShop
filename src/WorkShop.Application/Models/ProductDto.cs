@@ -1,4 +1,4 @@
-namespace WorkShop.Application.DTOs;
+namespace WorkShop.Application.Models;
 
 public class ProductDto
 {

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Application.Interfaces;
 
 namespace WorkShop.API.Controllers;
@@ -16,7 +16,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterDto registerDto)
+    public async Task<ActionResult<AuthResponseModel>> Register([FromBody] RegisterRequestModel registerDto)
     {
         var result = await _authService.RegisterAsync(registerDto);
         if (result == null)
@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginDto loginDto)
+    public async Task<ActionResult<AuthResponseModel>> Login([FromBody] LoginRequestModel loginDto)
     {
         var result = await _authService.LoginAsync(loginDto);
         if (result == null)

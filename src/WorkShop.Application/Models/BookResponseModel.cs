@@ -1,6 +1,6 @@
-namespace WorkShop.Application.DTOs;
+namespace WorkShop.Application.Models;
 
-public class BookDto
+public class BookResponseModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;

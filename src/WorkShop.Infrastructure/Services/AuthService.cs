@@ -5,7 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
 using WorkShop.Infrastructure.Data;
@@ -26,7 +26,7 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public async Task<AuthResponseDto?> RegisterAsync(RegisterDto registerDto)
+    public async Task<AuthResponseModel?> RegisterAsync(RegisterRequestModel registerDto)
     {
         // Check if user already exists
         if (await _context.Users.AnyAsync(u => u.Username == registerDto.Username || u.Email == registerDto.Email))
@@ -48,14 +48,14 @@ public class AuthService : IAuthService
 
         var token = GenerateJwtToken(user);
 
-        return new AuthResponseDto
+        return new AuthResponseModel
         {
             Token = token,
             Username = user.Username
         };
     }
 
-    public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
+    public async Task<AuthResponseModel?> LoginAsync(LoginRequestModel loginDto)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginDto.Username);
         if (user == null)
@@ -66,7 +66,7 @@ public class AuthService : IAuthService
 
         var token = GenerateJwtToken(user);
 
-        return new AuthResponseDto
+        return new AuthResponseModel
         {
             Token = token,
             Username = user.Username

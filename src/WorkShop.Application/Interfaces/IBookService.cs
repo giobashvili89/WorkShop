@@ -1,14 +1,14 @@
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 
 namespace WorkShop.Application.Interfaces;
 
 public interface IBookService
 {
-    Task<IEnumerable<BookDto>> GetAllBooksAsync();
-    Task<BookDto?> GetBookByIdAsync(int id);
-    Task<IEnumerable<BookDto>> GetBooksByAuthorAsync(string author);
-    Task<IEnumerable<BookDto>> GetBooksByCategoryAsync(string category);
-    Task<BookDto> CreateBookAsync(BookDto book);
-    Task<BookDto?> UpdateBookAsync(int id, BookDto book);
+    Task<IEnumerable<BookResponseModel>> GetAllBooksAsync();
+    Task<BookResponseModel?> GetBookByIdAsync(int id);
+    Task<IEnumerable<BookResponseModel>> GetBooksByAuthorAsync(string author);
+    Task<IEnumerable<BookResponseModel>> GetBooksByCategoryAsync(string category);
+    Task<BookResponseModel> CreateBookAsync(BookRequestModel book);
+    Task<BookResponseModel?> UpdateBookAsync(int id, BookRequestModel book);
     Task<bool> DeleteBookAsync(int id);
 }

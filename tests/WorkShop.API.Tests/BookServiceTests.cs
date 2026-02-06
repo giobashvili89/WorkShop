@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 using WorkShop.Domain.Entities;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
@@ -74,13 +74,13 @@ public class BookServiceTests
         // Arrange
         var context = GetInMemoryDbContext();
         var service = new BookService(context);
-        var bookDto = new BookDto
+        var bookDto = new BookRequestModel
         {
             Title = "New Book",
             Author = "New Author",
             Category = "Fiction",
             Description = "New Description",
-            PublishedDate = DateTime.UtcNow
+            PublishedDate = DateTime.UtcNow.AddDays(-1)
         };
 
         // Act
@@ -104,13 +104,13 @@ public class BookServiceTests
         await context.SaveChangesAsync();
         var service = new BookService(context);
 
-        var updatedDto = new BookDto
+        var updatedDto = new BookRequestModel
         {
             Title = "Updated Title",
             Author = "Updated Author",
             Category = "Updated Category",
             Description = "Updated Desc",
-            PublishedDate = DateTime.UtcNow
+            PublishedDate = DateTime.UtcNow.AddDays(-1)
         };
 
         // Act

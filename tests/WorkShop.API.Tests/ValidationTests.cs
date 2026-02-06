@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
-using WorkShop.Application.DTOs;
+using WorkShop.Application.Models;
 
 namespace WorkShop.API.Tests;
 
@@ -19,7 +19,7 @@ public class ValidationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         var client = _factory.CreateClient();
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "",
             Email = "test@example.com",
@@ -40,7 +40,7 @@ public class ValidationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         var client = _factory.CreateClient();
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "testuser",
             Email = "invalid-email",
@@ -61,7 +61,7 @@ public class ValidationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         var client = _factory.CreateClient();
-        var registerDto = new RegisterDto
+        var registerDto = new RegisterRequestModel
         {
             Username = "testuser",
             Email = "test@example.com",
@@ -82,7 +82,7 @@ public class ValidationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         var client = _factory.CreateClient();
-        var loginDto = new LoginDto
+        var loginDto = new LoginRequestModel
         {
             Username = "",
             Password = "password123"
@@ -102,7 +102,7 @@ public class ValidationTests : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         var client = _factory.CreateClient();
-        var loginDto = new LoginDto
+        var loginDto = new LoginRequestModel
         {
             Username = "testuser",
             Password = ""
