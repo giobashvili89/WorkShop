@@ -106,6 +106,7 @@ WorkShop/
 - **Clean Architecture**: The backend follows clean architecture principles with clear separation of concerns
 - **JWT Authentication**: Secure API endpoints with JSON Web Tokens
 - **PostgreSQL Database**: Persistent data storage with Entity Framework Core
+- **Secure Password Hashing**: Using PBKDF2 with SHA256, 100,000 iterations, and random salts for password security
 - **Book Management**: Full CRUD operations for books with filtering by author and category
 - **User Authentication**: Registration and login with secure password hashing
 - **RESTful API**: Full CRUD operations for product and book management
@@ -154,7 +155,28 @@ The JWT settings can be configured in `appsettings.json`:
 }
 ```
 
-**Important**: Change the `Secret` value in production to a secure random string.
+**Important**: Change the `Secret` value in production to a secure random string (at least 32 characters).
+
+## Security Best Practices
+
+### Password Security
+The application uses PBKDF2 (Password-Based Key Derivation Function 2) with the following configuration:
+- **Algorithm**: SHA256
+- **Iterations**: 100,000
+- **Salt Size**: 16 bytes (randomly generated per password)
+- **Hash Size**: 32 bytes
+
+This provides strong protection against brute-force and rainbow table attacks.
+
+### Configuration Security
+For production deployments:
+1. **Never commit sensitive credentials** to version control
+2. Use **environment variables** or **Azure Key Vault** for:
+   - Database connection strings
+   - JWT secret keys
+   - Any other sensitive configuration
+3. See `appsettings.Sample.json` for the configuration template
+4. Use **User Secrets** in development: `dotnet user-secrets init`
 
 ## Using the API with Authentication
 

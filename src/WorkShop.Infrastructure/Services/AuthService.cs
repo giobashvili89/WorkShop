@@ -16,6 +16,9 @@ public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
+    private const int SaltSize = 16;
+    private const int HashSize = 32;
+    private const int Iterations = 100000;
 
     public AuthService(AppDbContext context, IConfiguration configuration)
     {
@@ -29,7 +32,7 @@ public class AuthService : IAuthService
         if (await _context.Users.AnyAsync(u => u.Username == registerDto.Username || u.Email == registerDto.Email))
             return null;
 
-        // Hash the password
+        // Hash the password with PBKDF2
         var passwordHash = HashPassword(registerDto.Password);
 
         var user = new User
@@ -96,14 +99,42 @@ public class AuthService : IAuthService
 
     private string HashPassword(string password)
     {
-        using var sha256 = SHA256.Create();
-        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return Convert.ToBase64String(hashedBytes);
+        // Generate a random salt
+        using var rng = RandomNumberGenerator.Create();
+        var salt = new byte[SaltSize];
+        rng.GetBytes(salt);
+
+        // Hash password with PBKDF2
+        var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, HashSize);
+
+        // Combine salt and hash
+        var hashBytes = new byte[SaltSize + HashSize];
+        Array.Copy(salt, 0, hashBytes, 0, SaltSize);
+        Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
+
+        // Convert to base64 for storage
+        return Convert.ToBase64String(hashBytes);
     }
 
     private bool VerifyPassword(string password, string hashedPassword)
     {
-        var hashOfInput = HashPassword(password);
-        return hashOfInput == hashedPassword;
+        // Extract the bytes
+        var hashBytes = Convert.FromBase64String(hashedPassword);
+
+        // Extract the salt
+        var salt = new byte[SaltSize];
+        Array.Copy(hashBytes, 0, salt, 0, SaltSize);
+
+        // Compute the hash of the provided password
+        var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, HashSize);
+
+        // Compare the computed hash with the stored hash
+        for (int i = 0; i < HashSize; i++)
+        {
+            if (hashBytes[i + SaltSize] != hash[i])
+                return false;
+        }
+
+        return true;
     }
 }
