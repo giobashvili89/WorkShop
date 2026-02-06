@@ -1,0 +1,60 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: workshop-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-workshop_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workshop-network
+
+  # .NET API
+  api:
+    build:
+      context: .
+      dockerfile: src/WorkShop.API/Dockerfile
+    container_name: workshop-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-workshop_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
+      - Jwt__Secret=${JWT_SECRET:-YourSuperSecretKeyForJWTTokenGeneration12345}
+      - Jwt__Issuer=${JWT_ISSUER:-WorkShopAPI}
+      - Jwt__Audience=${JWT_AUDIENCE:-WorkShopClient}
+    ports:
+      - "5000:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - workshop-network
+
+  # React Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: workshop-client
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    networks:
+      - workshop-network
+
+volumes:
+  postgres_data:
+
+networks:
+  workshop-network:
+    driver: bridge
