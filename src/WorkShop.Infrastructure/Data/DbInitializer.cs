@@ -9,6 +9,8 @@ public static class DbInitializer
     public static async Task InitializeAsync(AppDbContext context)
     {
         // Ensure database is created
+        // Note: EnsureCreatedAsync() is used for simplicity in development.
+        // For production, consider using Migrations with MigrateAsync() instead.
         await context.Database.EnsureCreatedAsync();
 
         // Check if data already exists
@@ -67,6 +69,10 @@ public static class DbInitializer
 
     private static async Task SeedDefaultUserAsync(AppDbContext context)
     {
+        // WARNING: Default credentials are hardcoded for development/demo purposes only.
+        // For production, use environment variables or secure configuration.
+        // Consider only running this seeding in development environments.
+        
         // Create default admin user
         // Note: Password validation requires minimum 6 characters, using "admin1" instead of "admin"
         var passwordHash = PasswordHasher.HashPassword("admin1");
