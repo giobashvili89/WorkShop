@@ -18,6 +18,11 @@ WorkShop/
 
 ## Prerequisites
 
+### For Docker (Recommended)
+- Docker
+- Docker Compose
+
+### For Local Development
 - .NET 10 SDK
 - PostgreSQL 12 or higher
 - Node.js (v16 or higher)
@@ -25,7 +30,62 @@ WorkShop/
 
 ## Getting Started
 
-### Database Setup
+### Option 1: Running with Docker (Recommended)
+
+The easiest way to run the entire application stack is using Docker Compose:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/giobashvili89/WorkShop.git
+   cd WorkShop
+   ```
+
+2. Start all services (API, React client, and PostgreSQL):
+   ```bash
+   docker-compose up -d
+   ```
+
+3. Access the applications:
+   - **React Client**: http://localhost:3000
+   - **API**: http://localhost:5000
+   - **PostgreSQL**: localhost:5432
+
+4. View logs:
+   ```bash
+   # All services
+   docker-compose logs -f
+   
+   # Specific service
+   docker-compose logs -f api
+   docker-compose logs -f client
+   docker-compose logs -f postgres
+   ```
+
+5. Stop all services:
+   ```bash
+   docker-compose down
+   ```
+
+6. Stop and remove volumes (this will delete the database data):
+   ```bash
+   docker-compose down -v
+   ```
+
+#### Building Individual Docker Images
+
+Build the API image:
+```bash
+docker build -t workshop-api -f src/WorkShop.API/Dockerfile .
+```
+
+Build the React client image:
+```bash
+docker build -t workshop-client -f client/Dockerfile ./client
+```
+
+### Option 2: Running Locally
+
+#### Database Setup
 
 1. Install PostgreSQL and create a database:
    ```bash
@@ -39,7 +99,7 @@ WorkShop/
    }
    ```
 
-### Backend (.NET API)
+#### Backend (.NET API)
 
 1. Navigate to the repository root:
    ```bash
@@ -60,7 +120,7 @@ WorkShop/
 
    The API will be available at `http://localhost:5000` (or `https://localhost:5001`)
 
-### Frontend (React)
+#### Frontend (React)
 
 1. Navigate to the client directory:
    ```bash
