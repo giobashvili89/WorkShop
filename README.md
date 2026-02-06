@@ -18,12 +18,94 @@ WorkShop/
 
 ## Prerequisites
 
+### For Docker Deployment (Recommended)
+- Docker
+- Docker Compose
+
+### For Local Development
 - .NET 10 SDK
 - PostgreSQL 12 or higher
 - Node.js (v16 or higher)
 - npm or yarn
 
 ## Getting Started
+
+### Option 1: Running with Docker (Recommended)
+
+The easiest way to run the application is using Docker Compose, which will set up all services (PostgreSQL, API, and React frontend) automatically.
+
+1. Make sure Docker and Docker Compose are installed on your system
+
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/giobashvili89/WorkShop.git
+   cd WorkShop
+   ```
+
+3. Build and run all services:
+   ```bash
+   docker-compose up --build
+   ```
+
+   Or run in detached mode (background):
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. The services will be available at:
+   - **React Frontend**: http://localhost:3000
+   - **API**: http://localhost:5000
+   - **PostgreSQL**: localhost:5432
+
+5. To stop all services:
+   ```bash
+   docker-compose down
+   ```
+
+6. To stop and remove all data (including database):
+   ```bash
+   docker-compose down -v
+   ```
+
+#### Running Individual Services
+
+You can also run services individually:
+
+- **PostgreSQL only**:
+  ```bash
+  docker-compose up postgres
+  ```
+
+- **API only** (requires PostgreSQL):
+  ```bash
+  docker-compose up api
+  ```
+
+- **Frontend only**:
+  ```bash
+  docker-compose up client
+  ```
+
+#### Viewing Logs
+
+- View all logs:
+  ```bash
+  docker-compose logs
+  ```
+
+- View logs for a specific service:
+  ```bash
+  docker-compose logs api
+  docker-compose logs client
+  docker-compose logs postgres
+  ```
+
+- Follow logs in real-time:
+  ```bash
+  docker-compose logs -f
+  ```
+
+### Option 2: Running Locally (Development)
 
 ### Database Setup
 
@@ -103,6 +185,7 @@ WorkShop/
 
 ## Features
 
+- **Docker Support**: Full Docker and Docker Compose setup for easy deployment
 - **Clean Architecture**: The backend follows clean architecture principles with clear separation of concerns
 - **JWT Authentication**: Secure API endpoints with JSON Web Tokens
 - **PostgreSQL Database**: Persistent data storage with Entity Framework Core
@@ -130,6 +213,12 @@ WorkShop/
 - React.js
 - Vite
 - CSS3
+- Nginx (for production Docker deployment)
+
+### DevOps
+- Docker
+- Docker Compose
+- Multi-stage Docker builds
 
 ## Running Tests
 
