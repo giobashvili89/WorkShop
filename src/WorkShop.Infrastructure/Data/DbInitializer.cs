@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WorkShop.Domain.Entities;
-using System.Security.Cryptography;
-using System.Text;
+using WorkShop.Infrastructure.Services;
 
 namespace WorkShop.Infrastructure.Data;
 
@@ -55,7 +54,7 @@ public static class DbInitializer
                 Description = $"This is a comprehensive {category.ToLower()} book written by {author}. " +
                              $"It covers various aspects of {category.ToLower()} and provides valuable insights. " +
                              $"Published in {publishedYear}, this work has been influential in its field.",
-                PublishedDate = new DateTime(publishedYear, random.Next(1, 13), random.Next(1, 29)),
+                PublishedDate = DateTime.SpecifyKind(new DateTime(publishedYear, random.Next(1, 13), random.Next(1, 29)), DateTimeKind.Utc),
                 CreatedAt = DateTime.UtcNow
             });
         }
@@ -65,8 +64,9 @@ public static class DbInitializer
 
     private static async Task SeedDefaultUserAsync(AppDbContext context)
     {
-        // Create default admin user with username: admin, password: admin
-        var passwordHash = HashPassword("admin");
+        // Create default admin user
+        // Note: Password validation requires minimum 6 characters, using "admin1" instead of "admin"
+        var passwordHash = PasswordHasher.HashPassword("admin1");
 
         var adminUser = new User
         {
@@ -77,29 +77,5 @@ public static class DbInitializer
         };
 
         await context.Users.AddAsync(adminUser);
-    }
-
-    private static string HashPassword(string password)
-    {
-        // Use the same hashing algorithm as AuthService
-        const int SaltSize = 16;
-        const int HashSize = 32;
-        const int Iterations = 100000;
-
-        // Generate a random salt
-        using var rng = RandomNumberGenerator.Create();
-        var salt = new byte[SaltSize];
-        rng.GetBytes(salt);
-
-        // Hash password with PBKDF2
-        var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, HashSize);
-
-        // Combine salt and hash
-        var hashBytes = new byte[SaltSize + HashSize];
-        Array.Copy(salt, 0, hashBytes, 0, SaltSize);
-        Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
-
-        // Convert to base64 for storage
-        return Convert.ToBase64String(hashBytes);
     }
 }
