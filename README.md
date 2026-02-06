@@ -1,19 +1,19 @@
-# WorkShop
+# WorkShop - Book Selling Platform
 
-A full-stack application with .NET 10 API (Clean Architecture) and React.js frontend featuring JWT authentication and PostgreSQL database.
+A full-stack book selling application with .NET 10 API (Clean Architecture) and React.js frontend featuring JWT authentication, role-based access control, shopping cart, and PostgreSQL database.
 
 ## Project Structure
 
 ```
 WorkShop/
 ├── src/
-│   ├── WorkShop.Domain/          # Domain layer - Entities (Book, User, Product)
-│   ├── WorkShop.Application/     # Application layer - Business logic, DTOs, Interfaces
-│   ├── WorkShop.Infrastructure/  # Infrastructure layer - Implementations, DbContext
+│   ├── WorkShop.Domain/          # Domain layer - Entities (Book, User, Order, OrderItem, Product)
+│   ├── WorkShop.Application/     # Application layer - Business logic, DTOs, Interfaces, Validators
+│   ├── WorkShop.Infrastructure/  # Infrastructure layer - Implementations, DbContext, Services
 │   └── WorkShop.API/             # API layer - Controllers, Endpoints
 ├── tests/
 │   └── WorkShop.API.Tests/       # Unit tests for API
-└── client/                       # React.js frontend
+└── client/                       # React.js frontend with Tailwind CSS
 ```
 
 ## Prerequisites
@@ -164,17 +164,24 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
 ## API Endpoints
 
 ### Authentication (No auth required)
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login and receive JWT token
+- `POST /api/auth/register` - Register a new user (defaults to Customer role)
+- `POST /api/auth/login` - Login and receive JWT token with user role
 
-### Books (Requires JWT authentication)
-- `GET /api/books` - Get all books
-- `GET /api/books/{id}` - Get a book by ID
-- `GET /api/books/author/{author}` - Filter books by author
-- `GET /api/books/category/{category}` - Filter books by category
-- `POST /api/books` - Create a new book
-- `PUT /api/books/{id}` - Update a book
-- `DELETE /api/books/{id}` - Delete a book
+### Books (Public GET, Admin-only POST/PUT/DELETE)
+- `GET /api/books` - Get all books (public)
+- `GET /api/books/{id}` - Get a book by ID (public)
+- `GET /api/books/author/{author}` - Filter books by author (public)
+- `GET /api/books/category/{category}` - Filter books by category (public)
+- `POST /api/books` - Create a new book (Admin only)
+- `PUT /api/books/{id}` - Update a book (Admin only)
+- `DELETE /api/books/{id}` - Delete a book (Admin only)
+
+### Orders (Requires JWT authentication)
+- `POST /api/orders` - Create a new order (place an order)
+- `GET /api/orders/{id}` - Get order details
+- `GET /api/orders/my-orders` - Get current user's order history
+- `GET /api/orders` - Get all orders (Admin only)
+- `DELETE /api/orders/{id}` - Cancel an order
 
 ### Products
 - `GET /api/products` - Get all products
@@ -185,18 +192,34 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
 
 ## Features
 
-- **Clean Architecture**: The backend follows clean architecture principles with clear separation of concerns
+### E-commerce Features
+- **Book Shopping**: Browse books in an attractive card-based layout
+- **Shopping Cart**: Add books to cart, adjust quantities, and checkout
+- **Order Management**: Track order history and cancel orders
+- **Stock Management**: Real-time stock tracking with quantity validation
+- **Role-Based Access**: Admin users can manage inventory, customers can browse and purchase
+
+### Authentication & Authorization
 - **JWT Authentication**: Secure API endpoints with JSON Web Tokens
+- **Role-Based Authorization**: Separate Admin and Customer roles
+- **Secure Password Hashing**: Using PBKDF2 with SHA256
+
+### Technical Features
+- **Clean Architecture**: Backend follows clean architecture principles with clear separation of concerns
 - **PostgreSQL Database**: Persistent data storage with Entity Framework Core
 - **Docker Support**: Complete Docker and Docker Compose configuration for easy deployment
-- **Secure Password Hashing**: Using PBKDF2 with SHA256, 100,000 iterations, and random salts for password security
-- **Book Management**: Full CRUD operations for books with filtering by author and category
-- **User Authentication**: Registration and login with secure password hashing
-- **RESTful API**: Full CRUD operations for product and book management
+- **Book Management**: Full CRUD operations with filtering by author and category
+- **RESTful API**: Complete REST API with proper status codes
 - **CORS Enabled**: API configured to accept requests from React frontend
-- **Modern React**: Frontend built with React using Vite for fast development
-- **Responsive UI**: Clean and responsive management interface
+- **Modern React**: Frontend built with React using Vite and Tailwind CSS
+- **Responsive UI**: Beautiful, responsive interface optimized for all devices
 - **Unit Tests**: Comprehensive test coverage with xUnit
+- **FluentValidation**: Input validation with FluentValidation library
+
+### Demo Accounts
+The application is seeded with demo accounts:
+- **Admin**: username: `admin`, password: `admin1`
+- **Customer**: username: `customer`, password: `customer1`
 
 ## Technologies Used
 
@@ -217,7 +240,8 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
 ### Frontend
 - React.js
 - Vite
-- CSS3
+- Tailwind CSS
+- Modern ES6+ JavaScript
 
 ## Running Tests
 
