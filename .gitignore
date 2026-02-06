@@ -62,3 +62,14 @@ dist/
 .env
 .env.local
 .env.production
+
+# JetBrains Rider / IntelliJ IDEA
+.idea/
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
