@@ -8,7 +8,6 @@ namespace WorkShop.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class BooksController : ControllerBase
 {
     private readonly IBookService _bookService;
@@ -49,6 +48,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BookResponseModel>> CreateBook([FromBody] BookRequestModel bookDto)
     {
         var createdBook = await _bookService.CreateBookAsync(bookDto);
@@ -56,6 +56,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BookResponseModel>> UpdateBook(int id, [FromBody] BookRequestModel bookDto)
     {
         var updatedBook = await _bookService.UpdateBookAsync(id, bookDto);
@@ -65,6 +66,7 @@ public class BooksController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteBook(int id)
     {
         var result = await _bookService.DeleteBookAsync(id);

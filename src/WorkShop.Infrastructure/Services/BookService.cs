@@ -26,6 +26,10 @@ public class BookService : IBookService
             Author = b.Author,
             Category = b.Category,
             Description = b.Description,
+            ISBN = b.ISBN,
+            Price = b.Price,
+            StockQuantity = b.StockQuantity,
+            SoldCount = b.SoldCount,
             PublishedDate = b.PublishedDate
         });
     }
@@ -43,6 +47,10 @@ public class BookService : IBookService
             Author = book.Author,
             Category = book.Category,
             Description = book.Description,
+            ISBN = book.ISBN,
+            Price = book.Price,
+            StockQuantity = book.StockQuantity,
+            SoldCount = book.SoldCount,
             PublishedDate = book.PublishedDate
         };
     }
@@ -60,6 +68,10 @@ public class BookService : IBookService
             Author = b.Author,
             Category = b.Category,
             Description = b.Description,
+            ISBN = b.ISBN,
+            Price = b.Price,
+            StockQuantity = b.StockQuantity,
+            SoldCount = b.SoldCount,
             PublishedDate = b.PublishedDate
         });
     }
@@ -77,6 +89,10 @@ public class BookService : IBookService
             Author = b.Author,
             Category = b.Category,
             Description = b.Description,
+            ISBN = b.ISBN,
+            Price = b.Price,
+            StockQuantity = b.StockQuantity,
+            SoldCount = b.SoldCount,
             PublishedDate = b.PublishedDate
         });
     }
@@ -89,6 +105,10 @@ public class BookService : IBookService
             Author = bookDto.Author,
             Category = bookDto.Category,
             Description = bookDto.Description,
+            ISBN = bookDto.ISBN,
+            Price = bookDto.Price,
+            StockQuantity = bookDto.StockQuantity,
+            SoldCount = 0,
             PublishedDate = bookDto.PublishedDate,
             CreatedAt = DateTime.UtcNow
         };
@@ -103,6 +123,10 @@ public class BookService : IBookService
             Author = book.Author,
             Category = book.Category,
             Description = book.Description,
+            ISBN = book.ISBN,
+            Price = book.Price,
+            StockQuantity = book.StockQuantity,
+            SoldCount = book.SoldCount,
             PublishedDate = book.PublishedDate
         };
     }
@@ -117,6 +141,9 @@ public class BookService : IBookService
         book.Author = bookDto.Author;
         book.Category = bookDto.Category;
         book.Description = bookDto.Description;
+        book.ISBN = bookDto.ISBN;
+        book.Price = bookDto.Price;
+        book.StockQuantity = bookDto.StockQuantity;
         book.PublishedDate = bookDto.PublishedDate;
 
         await _context.SaveChangesAsync();
@@ -128,6 +155,10 @@ public class BookService : IBookService
             Author = book.Author,
             Category = book.Category,
             Description = book.Description,
+            ISBN = book.ISBN,
+            Price = book.Price,
+            StockQuantity = book.StockQuantity,
+            SoldCount = book.SoldCount,
             PublishedDate = book.PublishedDate
         };
     }

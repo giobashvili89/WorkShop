@@ -38,6 +38,7 @@ public class AuthService : IAuthService
             Username = registerDto.Username,
             Email = registerDto.Email,
             PasswordHash = passwordHash,
+            Role = "Customer", // Default role for new registrations
             CreatedAt = DateTime.UtcNow
         };
 
@@ -49,7 +50,9 @@ public class AuthService : IAuthService
         return new AuthResponseModel
         {
             Token = token,
-            Username = user.Username
+            Username = user.Username,
+            Role = user.Role,
+            UserId = user.Id
         };
     }
 
@@ -67,7 +70,9 @@ public class AuthService : IAuthService
         return new AuthResponseModel
         {
             Token = token,
-            Username = user.Username
+            Username = user.Username,
+            Role = user.Role,
+            UserId = user.Id
         };
     }
 
@@ -81,7 +86,8 @@ public class AuthService : IAuthService
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role)
         };
 
         var token = new JwtSecurityToken(
