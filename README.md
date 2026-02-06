@@ -90,8 +90,14 @@ docker build -t workshop-client -f client/Dockerfile ./client
 
 #### Docker Environment Variables
 
-The `docker-compose.yml` file includes default environment variables. For production, create a `.env` file:
+The `docker-compose.yml` file includes default environment variables. For production, copy `.env.example` to `.env` and update the values:
 
+```bash
+cp .env.example .env
+# Edit .env with your secure values
+```
+
+Example `.env` file:
 ```env
 POSTGRES_DB=workshop_db
 POSTGRES_USER=your_user

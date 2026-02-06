@@ -2,12 +2,15 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
-# Copy all files
-COPY . .
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
 
 # Install dependencies
 # Note: In restricted environments, you may need to build with --network=host
 RUN npm install --prefer-offline --no-audit
+
+# Copy source files
+COPY . .
 
 # Build the application
 RUN npm run build
