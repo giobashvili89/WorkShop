@@ -16,7 +16,6 @@ builder.Services.AddControllers();
 
 // Add FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssemblyContaining<BookDtoValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
