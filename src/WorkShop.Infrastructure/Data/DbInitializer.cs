@@ -22,8 +22,8 @@ public static class DbInitializer
         // Seed Books - 100 records
         await SeedBooksAsync(context);
 
-        // Seed Default Admin User
-        await SeedDefaultUserAsync(context);
+        // Seed Default Users (Admin and Customer)
+        await SeedDefaultUsersAsync(context);
 
         await context.SaveChangesAsync();
     }
@@ -59,6 +59,10 @@ public static class DbInitializer
                 Description = $"This is a comprehensive {category.ToLower()} book written by {author}. " +
                              $"It covers various aspects of {category.ToLower()} and provides valuable insights. " +
                              $"Published in {publishedYear}, this work has been influential in its field.",
+                ISBN = $"978-{random.Next(1000000000, 2000000000)}",
+                Price = Math.Round((decimal)(random.NextDouble() * 50 + 9.99), 2), // Price between $9.99 and $59.99
+                StockQuantity = random.Next(10, 100), // Stock between 10 and 100
+                SoldCount = 0,
                 PublishedDate = DateTime.SpecifyKind(new DateTime(publishedYear, publishedMonth, publishedDay), DateTimeKind.Utc),
                 CreatedAt = DateTime.UtcNow
             });
@@ -67,7 +71,7 @@ public static class DbInitializer
         await context.Books.AddRangeAsync(books);
     }
 
-    private static async Task SeedDefaultUserAsync(AppDbContext context)
+    private static async Task SeedDefaultUsersAsync(AppDbContext context)
     {
         // WARNING: Default credentials are hardcoded for development/demo purposes only.
         // For production, use environment variables or secure configuration.
@@ -75,16 +79,31 @@ public static class DbInitializer
         
         // Create default admin user
         // Note: Password validation requires minimum 6 characters, using "admin1" instead of "admin"
-        var passwordHash = PasswordHasher.HashPassword("admin1");
+        var adminPasswordHash = PasswordHasher.HashPassword("admin1");
 
         var adminUser = new User
         {
             Username = "admin",
             Email = "admin@workshop.com",
-            PasswordHash = passwordHash,
+            PasswordHash = adminPasswordHash,
+            Role = "Admin",
             CreatedAt = DateTime.UtcNow
         };
 
         await context.Users.AddAsync(adminUser);
+
+        // Create default customer user for testing
+        var customerPasswordHash = PasswordHasher.HashPassword("customer1");
+
+        var customerUser = new User
+        {
+            Username = "customer",
+            Email = "customer@workshop.com",
+            PasswordHash = customerPasswordHash,
+            Role = "Customer",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await context.Users.AddAsync(customerUser);
     }
 }

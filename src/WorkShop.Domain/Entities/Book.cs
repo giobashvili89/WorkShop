@@ -7,6 +7,10 @@ public class Book
     public string Author { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public string ISBN { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public int StockQuantity { get; set; }
+    public int SoldCount { get; set; } = 0;
     public DateTime PublishedDate { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -22,6 +22,16 @@ public class BookRequestModelValidator : AbstractValidator<BookRequestModel>
         RuleFor(x => x.Description)
             .MaximumLength(1000).WithMessage("Description cannot exceed 1000 characters.");
 
+        RuleFor(x => x.ISBN)
+            .NotEmpty().WithMessage("ISBN is required.")
+            .MaximumLength(20).WithMessage("ISBN cannot exceed 20 characters.");
+
+        RuleFor(x => x.Price)
+            .GreaterThan(0).WithMessage("Price must be greater than 0.");
+
+        RuleFor(x => x.StockQuantity)
+            .GreaterThanOrEqualTo(0).WithMessage("Stock quantity cannot be negative.");
+
         RuleFor(x => x.PublishedDate)
             .NotEmpty().WithMessage("Published date is required.")
             .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Published date cannot be in the future.");
