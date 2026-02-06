@@ -39,13 +39,11 @@ public static class PasswordHasher
         // Compute the hash of the provided password
         var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, HashSize);
 
-        // Compare the computed hash with the stored hash
-        for (int i = 0; i < HashSize; i++)
-        {
-            if (hashBytes[i + SaltSize] != hash[i])
-                return false;
-        }
+        // Extract the stored hash
+        var storedHash = new byte[HashSize];
+        Array.Copy(hashBytes, SaltSize, storedHash, 0, HashSize);
 
-        return true;
+        // Use constant-time comparison to prevent timing attacks
+        return CryptographicOperations.FixedTimeEquals(hash, storedHash);
     }
 }

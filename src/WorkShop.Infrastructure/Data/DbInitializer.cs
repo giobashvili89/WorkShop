@@ -45,6 +45,9 @@ public static class DbInitializer
             var author = authors[random.Next(authors.Length)];
             var category = categories[random.Next(categories.Length)];
             var publishedYear = random.Next(1900, 2024);
+            var publishedMonth = random.Next(1, 13);
+            var daysInMonth = DateTime.DaysInMonth(publishedYear, publishedMonth);
+            var publishedDay = random.Next(1, daysInMonth + 1);
 
             books.Add(new Book
             {
@@ -54,7 +57,7 @@ public static class DbInitializer
                 Description = $"This is a comprehensive {category.ToLower()} book written by {author}. " +
                              $"It covers various aspects of {category.ToLower()} and provides valuable insights. " +
                              $"Published in {publishedYear}, this work has been influential in its field.",
-                PublishedDate = DateTime.SpecifyKind(new DateTime(publishedYear, random.Next(1, 13), random.Next(1, 29)), DateTimeKind.Utc),
+                PublishedDate = DateTime.SpecifyKind(new DateTime(publishedYear, publishedMonth, publishedDay), DateTimeKind.Utc),
                 CreatedAt = DateTime.UtcNow
             });
         }
