@@ -11,6 +11,10 @@ function AdminBookManagement() {
   const [coverFile, setCoverFile] = useState(null);
   const [sortField, setSortField] = useState('id');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [titleFilter, setTitleFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const itemsPerPage = 20;
   const [formData, setFormData] = useState({
     title: '',
@@ -153,8 +157,35 @@ function AdminBookManagement() {
     setCurrentPage(1);
   };
 
+  // Extract unique categories for filter
+  const categories = ['All', ...new Set(books.map(book => book.category))];
+
+  // Filter books
+  const filteredBooks = books.filter(book => {
+    // Title filter
+    if (titleFilter && !book.title.toLowerCase().includes(titleFilter.toLowerCase())) {
+      return false;
+    }
+    
+    // Category filter
+    if (categoryFilter !== 'All' && book.category !== categoryFilter) {
+      return false;
+    }
+    
+    // Price filter
+    if (minPrice !== '' && book.price < parseFloat(minPrice)) {
+      return false;
+    }
+    
+    if (maxPrice !== '' && book.price > parseFloat(maxPrice)) {
+      return false;
+    }
+    
+    return true;
+  });
+
   // Sort books
-  const sortedBooks = [...books].sort((a, b) => {
+  const sortedBooks = [...filteredBooks].sort((a, b) => {
     let aValue, bValue;
     
     switch(sortField) {
@@ -214,6 +245,92 @@ function AdminBookManagement() {
         >
           Add New Book
         </button>
+      </div>
+
+      {/* Filter Section */}
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4 text-gray-700">Filters</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Search by Title</label>
+            <input
+              type="text"
+              value={titleFilter}
+              onChange={(e) => {
+                setTitleFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Enter title..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Category</label>
+            <select
+              value={categoryFilter}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Min Price ($)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={minPrice}
+              onChange={(e) => {
+                setMinPrice(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="0.00"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Max Price ($)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={maxPrice}
+              onChange={(e) => {
+                setMaxPrice(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="999.99"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        {(titleFilter || categoryFilter !== 'All' || minPrice || maxPrice) && (
+          <div className="mt-4 flex justify-between items-center">
+            <p className="text-sm text-gray-600">
+              Showing {sortedBooks.length} of {books.length} books
+            </p>
+            <button
+              onClick={() => {
+                setTitleFilter('');
+                setCategoryFilter('All');
+                setMinPrice('');
+                setMaxPrice('');
+                setCurrentPage(1);
+              }}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Modal for Add/Edit Book */}
