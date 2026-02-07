@@ -48,6 +48,8 @@ CodeCoverage/
 *.dll
 *.exe
 *.pdb
+*.deps.json
+*.runtimeconfig.json
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
