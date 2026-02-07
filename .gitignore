@@ -44,6 +44,11 @@ CodeCoverage/
 # MSBuild Binary and Structured Log
 *.binlog
 
+# Build artifacts (DLL, EXE, PDB files)
+*.dll
+*.exe
+*.pdb
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
