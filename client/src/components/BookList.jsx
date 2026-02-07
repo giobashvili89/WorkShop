@@ -112,7 +112,7 @@ function BookList() {
 
   const validateDeliveryInfo = () => {
     const errors = {};
-    const phoneRegex = /^[\+]?[0-9\s\-()]{7,20}$/;
+    const phoneRegex = /^[+]?[0-9\s\-()]{7,20}$/;
     
     if (!deliveryInfo.phoneNumber.trim()) {
       errors.phoneNumber = 'Phone number is required';
