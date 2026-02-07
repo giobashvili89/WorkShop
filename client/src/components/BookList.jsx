@@ -13,6 +13,13 @@ function BookList() {
   const [categories, setCategories] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
   const [visibleCount, setVisibleCount] = useState(10);
+  const [showDeliveryForm, setShowDeliveryForm] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState({
+    phoneNumber: '',
+    alternativePhoneNumber: '',
+    homeAddress: ''
+  });
+  const [deliveryErrors, setDeliveryErrors] = useState({});
 
   useEffect(() => {
     loadBooks();
@@ -103,20 +110,81 @@ function BookList() {
     }
   };
 
+  const validateDeliveryInfo = () => {
+    const errors = {};
+    const phoneRegex = /^[\+]?[0-9\s\-()]{7,20}$/;
+    
+    if (!deliveryInfo.phoneNumber.trim()) {
+      errors.phoneNumber = 'Phone number is required';
+    } else if (!phoneRegex.test(deliveryInfo.phoneNumber)) {
+      errors.phoneNumber = 'Phone number must be 7-20 characters and contain only numbers, +, spaces, -, and parentheses';
+    }
+    
+    if (!deliveryInfo.alternativePhoneNumber.trim()) {
+      errors.alternativePhoneNumber = 'Alternative phone number is required';
+    } else if (!phoneRegex.test(deliveryInfo.alternativePhoneNumber)) {
+      errors.alternativePhoneNumber = 'Alternative phone number must be 7-20 characters and contain only numbers, +, spaces, -, and parentheses';
+    }
+    
+    if (!deliveryInfo.homeAddress.trim()) {
+      errors.homeAddress = 'Home address is required';
+    } else if (deliveryInfo.homeAddress.trim().length < 10) {
+      errors.homeAddress = 'Home address must be at least 10 characters';
+    } else if (deliveryInfo.homeAddress.trim().length > 500) {
+      errors.homeAddress = 'Home address must not exceed 500 characters';
+    }
+    
+    setDeliveryErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleProceedToDelivery = () => {
+    if (cart.length === 0) {
+      alert('Your cart is empty');
+      return;
+    }
+    setShowDeliveryForm(true);
+  };
+
   const handleCheckout = async () => {
+    if (!validateDeliveryInfo()) {
+      return;
+    }
+    
     try {
       const orderItems = cart.map(item => ({
         bookId: item.bookId,
         quantity: item.quantity
       }));
       
-      await orderService.createOrder(orderItems);
+      await orderService.createOrder(orderItems, deliveryInfo);
       alert('Order placed successfully!');
       setCart([]);
       setShowCart(false);
+      setShowDeliveryForm(false);
+      setDeliveryInfo({
+        phoneNumber: '',
+        alternativePhoneNumber: '',
+        homeAddress: ''
+      });
+      setDeliveryErrors({});
       loadBooks(); // Reload to update stock
     } catch (err) {
       alert('Failed to place order: ' + err.message);
+    }
+  };
+
+  const handleDeliveryInfoChange = (field, value) => {
+    setDeliveryInfo(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    // Clear error for this field when user starts typing
+    if (deliveryErrors[field]) {
+      setDeliveryErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
     }
   };
 
@@ -181,51 +249,136 @@ function BookList() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold">Shopping Cart</h2>
+              <h2 className="text-2xl font-bold">
+                {showDeliveryForm ? 'Delivery Information' : 'Shopping Cart'}
+              </h2>
               <button
-                onClick={() => setShowCart(false)}
+                onClick={() => {
+                  setShowCart(false);
+                  setShowDeliveryForm(false);
+                  setDeliveryErrors({});
+                }}
                 className="text-gray-500 hover:text-gray-700 text-2xl"
               >
                 ×
               </button>
             </div>
 
-            {cart.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">Your cart is empty</p>
-            ) : (
-              <>
-                <div className="space-y-4">
-                  {cart.map(item => (
-                    <div key={item.bookId} className="flex items-center justify-between border-b pb-4">
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{item.book.title}</h3>
-                        <p className="text-gray-600">${item.book.price.toFixed(2)}</p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
+            {!showDeliveryForm ? (
+              // Cart View
+              cart.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {cart.map(item => (
+                      <div key={item.bookId} className="flex items-center justify-between border-b pb-4">
+                        <div className="flex-1">
+                          <h3 className="font-semibold">{item.book.title}</h3>
+                          <p className="text-gray-600">${item.book.price.toFixed(2)}</p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => updateQuantity(item.bookId, item.quantity - 1)}
+                              className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+                            >
+                              -
+                            </button>
+                            <span className="w-12 text-center">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.bookId, item.quantity + 1)}
+                              className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+                            >
+                              +
+                            </button>
+                          </div>
                           <button
-                            onClick={() => updateQuantity(item.bookId, item.quantity - 1)}
-                            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+                            onClick={() => removeFromCart(item.bookId)}
+                            className="text-red-600 hover:text-red-800"
                           >
-                            -
-                          </button>
-                          <span className="w-12 text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.bookId, item.quantity + 1)}
-                            className="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
-                          >
-                            +
+                            Remove
                           </button>
                         </div>
-                        <button
-                          onClick={() => removeFromCart(item.bookId)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          Remove
-                        </button>
                       </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 border-t pt-4">
+                    <div className="flex justify-between text-xl font-bold mb-4">
+                      <span>Total:</span>
+                      <span>${cartTotal.toFixed(2)}</span>
                     </div>
-                  ))}
+                    <button
+                      onClick={handleProceedToDelivery}
+                      className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+                    >
+                      Proceed to Delivery Information
+                    </button>
+                  </div>
+                </>
+              )
+            ) : (
+              // Delivery Form View
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={deliveryInfo.phoneNumber}
+                    onChange={(e) => handleDeliveryInfoChange('phoneNumber', e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                      deliveryErrors.phoneNumber 
+                        ? 'border-red-500 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
+                    placeholder="+1 234 567 8900"
+                  />
+                  {deliveryErrors.phoneNumber && (
+                    <p className="text-red-500 text-sm mt-1">{deliveryErrors.phoneNumber}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Alternative Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={deliveryInfo.alternativePhoneNumber}
+                    onChange={(e) => handleDeliveryInfoChange('alternativePhoneNumber', e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                      deliveryErrors.alternativePhoneNumber 
+                        ? 'border-red-500 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
+                    placeholder="+1 234 567 8901"
+                  />
+                  {deliveryErrors.alternativePhoneNumber && (
+                    <p className="text-red-500 text-sm mt-1">{deliveryErrors.alternativePhoneNumber}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Home Address <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={deliveryInfo.homeAddress}
+                    onChange={(e) => handleDeliveryInfoChange('homeAddress', e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                      deliveryErrors.homeAddress 
+                        ? 'border-red-500 focus:ring-red-500' 
+                        : 'border-gray-300 focus:ring-blue-500'
+                    }`}
+                    rows="3"
+                    placeholder="123 Main St, Apt 4, City, State, ZIP"
+                  />
+                  {deliveryErrors.homeAddress && (
+                    <p className="text-red-500 text-sm mt-1">{deliveryErrors.homeAddress}</p>
+                  )}
                 </div>
 
                 <div className="mt-6 border-t pt-4">
@@ -233,14 +386,22 @@ function BookList() {
                     <span>Total:</span>
                     <span>${cartTotal.toFixed(2)}</span>
                   </div>
-                  <button
-                    onClick={handleCheckout}
-                    className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
-                  >
-                    Checkout
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowDeliveryForm(false)}
+                      className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition"
+                    >
+                      Back to Cart
+                    </button>
+                    <button
+                      onClick={handleCheckout}
+                      className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+                    >
+                      Place Order
+                    </button>
+                  </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>

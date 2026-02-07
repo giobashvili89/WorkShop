@@ -118,6 +118,30 @@ function OrderHistory() {
                 </div>
               </div>
 
+              {/* Delivery Information */}
+              {(order.phoneNumber || order.alternativePhoneNumber || order.homeAddress) && (
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="font-semibold mb-2">Delivery Information:</h3>
+                  <div className="bg-gray-50 p-3 rounded space-y-1">
+                    {order.phoneNumber && (
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">Phone:</span> {order.phoneNumber}
+                      </p>
+                    )}
+                    {order.alternativePhoneNumber && (
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">Alt. Phone:</span> {order.alternativePhoneNumber}
+                      </p>
+                    )}
+                    {order.homeAddress && (
+                      <p className="text-sm text-gray-700">
+                        <span className="font-medium">Address:</span> {order.homeAddress}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {!isAdmin && order.canCancel && (
                 <div className="mt-4 border-t pt-4">
                   <div className="flex justify-between items-center">
