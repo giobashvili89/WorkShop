@@ -32,9 +32,11 @@ function OrderHistory() {
     
     try {
       await orderService.cancelOrder(orderId);
+      alert('Order cancelled successfully! A confirmation email has been sent.');
       loadOrders();
     } catch (err) {
-      alert('Failed to cancel order: ' + err.message);
+      const errorMessage = err.response?.data?.message || err.message;
+      alert('Failed to cancel order: ' + errorMessage);
     }
   };
 
@@ -79,6 +81,11 @@ function OrderHistory() {
                   <p className="text-gray-600">
                     Date: {new Date(order.orderDate).toLocaleString()}
                   </p>
+                  {order.trackingStatus && (
+                    <p className="text-sm text-blue-600 font-medium mt-1">
+                      📦 {order.trackingStatus}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right">
                   <span className={`inline-block px-4 py-2 rounded-lg font-semibold ${
@@ -106,14 +113,27 @@ function OrderHistory() {
                         </p>
                       </div>
                       <p className="font-semibold">${item.totalPrice.toFixed(2)}</p>
-                    </div>
-                  ))}
+               !isAdmin && order.canCancel && (
+                <div className="mt-4 border-t pt-4">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-600">
+                      ℹ️ You can cancel this order within 1 hour of placement
+                    </p>
+                    <button
+                      onClick={() => handleCancelOrder(order.id)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                    >
+                      Cancel Order
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {order.status === 'Completed' && !isAdmin && (
-                <div className="mt-4 flex justify-end">
-                  <button
+              {!isAdmin && order.status === 'Completed' && !order.canCancel && (
+                <div className="mt-4 border-t pt-4">
+                  <p className="text-sm text-gray-500 italic">
+                    ⚠️ Cancellation period (1 hour) has expired for this order
+                  </p
                     onClick={() => handleCancelOrder(order.id)}
                     className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
                   >

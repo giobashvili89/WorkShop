@@ -10,10 +10,12 @@ namespace WorkShop.Infrastructure.Services;
 public class OrderService : IOrderService
 {
     private readonly AppDbContext _context;
+    private readonly IEmailService _emailService;
 
-    public OrderService(AppDbContext context)
+    public OrderService(AppDbContext context, IEmailService emailService)
     {
         _context = context;
+        _emailService = emailService;
     }
 
     public async Task<OrderResponseModel?> CreateOrderAsync(int userId, OrderRequestModel orderDto)
@@ -26,7 +28,8 @@ public class OrderService : IOrderService
             {
                 UserId = userId,
                 OrderDate = DateTime.UtcNow,
-                Status = "Pending"
+                Status = "Pending",
+                TrackingStatus = "Order Placed"
             };
 
             decimal totalAmount = 0;
@@ -70,6 +73,15 @@ public class OrderService : IOrderService
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
+            // Send order confirmation email
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                await _emailService.SendOrderConfirmationEmailAsync(order, user);
+                order.EmailSent = true;
+                await _context.SaveChangesAsync();
+            }
+
             return await GetOrderByIdAsync(order.Id);
         }
         catch
@@ -90,6 +102,9 @@ public class OrderService : IOrderService
         if (order == null)
             return null;
 
+        var canCancel = order.Status != "Cancelled" && 
+                        (DateTime.UtcNow - order.OrderDate).TotalHours <= 1;
+
         return new OrderResponseModel
         {
             Id = order.Id,
@@ -97,8 +112,10 @@ public class OrderService : IOrderService
             Username = order.User.Username,
             TotalAmount = order.TotalAmount,
             Status = order.Status,
+            TrackingStatus = order.TrackingStatus,
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
+            CanCancel = canCancel,
             Items = order.OrderItems.Select(oi => new OrderItemResponseModel
             {
                 Id = oi.Id,
@@ -128,8 +145,10 @@ public class OrderService : IOrderService
             Username = order.User.Username,
             TotalAmount = order.TotalAmount,
             Status = order.Status,
+            TrackingStatus = order.TrackingStatus,
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
+            CanCancel = order.Status != "Cancelled" && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
             Items = order.OrderItems.Select(oi => new OrderItemResponseModel
             {
                 Id = oi.Id,
@@ -158,8 +177,10 @@ public class OrderService : IOrderService
             Username = order.User.Username,
             TotalAmount = order.TotalAmount,
             Status = order.Status,
+            TrackingStatus = order.TrackingStatus,
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
+            CanCancel = order.Status != "Cancelled" && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
             Items = order.OrderItems.Select(oi => new OrderItemResponseModel
             {
                 Id = oi.Id,
@@ -175,12 +196,20 @@ public class OrderService : IOrderService
     public async Task<bool> CancelOrderAsync(int orderId, int userId)
     {
         var order = await _context.Orders
+            .Include(o => o.User)
             .Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Book)
             .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
 
         if (order == null || order.Status == "Cancelled")
             return false;
+
+        // Check if order is within 1 hour cancellation window
+        var hoursSinceOrder = (DateTime.UtcNow - order.OrderDate).TotalHours;
+        if (hoursSinceOrder > 1)
+        {
+            throw new InvalidOperationException("Order can only be cancelled within 1 hour of placement.");
+        }
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         
@@ -197,6 +226,9 @@ public class OrderService : IOrderService
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
+            // Send cancellation email
+            await _emailService.SendOrderCancellationEmailAsync(order, order.User);
+
             return true;
         }
         catch
@@ -206,3 +238,4 @@ public class OrderService : IOrderService
         }
     }
 }
+

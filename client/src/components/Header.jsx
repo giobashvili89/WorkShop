@@ -33,16 +33,18 @@ function Header({ onLogout, currentView, setCurrentView }) {
                   Manage Books
                 </button>
               )}
-              <button
-                onClick={() => setCurrentView('orders')}
-                className={`px-4 py-2 rounded-lg transition text-white ${
-                  currentView === 'orders'
-                    ? 'bg-blue-700'
-                    : 'bg-blue-600 hover:bg-blue-500'
-                }`}
-              >
-                My Orders
-              </button>
+              {!isAdmin && (
+                <button
+                  onClick={() => setCurrentView('orders')}
+                  className={`px-4 py-2 rounded-lg transition text-white ${
+                    currentView === 'orders'
+                      ? 'bg-blue-700'
+                      : 'bg-blue-600 hover:bg-blue-500'
+                  }`}
+                >
+                  My Orders
+                </button>
+              )}
             </nav>
           </div>
           <div className="flex items-center space-x-4">

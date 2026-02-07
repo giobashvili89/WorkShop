@@ -7,8 +7,10 @@ public class Order
     public User User { get; set; } = null!;
     public decimal TotalAmount { get; set; }
     public string Status { get; set; } = "Pending"; // Pending, Completed, Cancelled
+    public string TrackingStatus { get; set; } = "Order Placed"; // Order Placed, Processing, In Warehouse, On The Way, Out for Delivery, Delivered
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
     public DateTime? CompletedDate { get; set; }
+    public bool EmailSent { get; set; } = false;
     
     // Navigation property
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

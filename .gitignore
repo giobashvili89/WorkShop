@@ -73,3 +73,7 @@ dist/
 *.suo
 *.userosscache
 *.sln.docstates
+
+# Uploaded files (user-generated content)
+src/WorkShop.API/wwwroot/uploads/**/*
+!src/WorkShop.API/wwwroot/uploads/.gitkeep

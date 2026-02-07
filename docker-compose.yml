@@ -37,6 +37,8 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE:-WorkShopClient}
     ports:
       - "5000:8080"
+    volumes:
+      - ./src/WorkShop.API/wwwroot/uploads:/app/wwwroot/uploads
     depends_on:
       postgres:
         condition: service_healthy

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { bookService } from '../services/bookService';
 import { orderService } from '../services/orderService';
+import { authService } from '../services/authService';
 
 function BookList() {
   const [books, setBooks] = useState([]);
@@ -115,21 +116,25 @@ function BookList() {
     );
   }
 
+  const isAdmin = authService.isAdmin();
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800">Book Store</h1>
-        <button
-          onClick={() => setShowCart(!showCart)}
-          className="relative bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Cart ({cart.length})
-          {cart.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">
-              {cart.length}
-            </span>
-          )}
-        </button>
+        {!isAdmin && (
+          <button
+            onClick={() => setShowCart(!showCart)}
+            className="relative bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            Cart ({cart.length})
+            {cart.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm">
+                {cart.length}
+              </span>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Category Filter */}
@@ -150,7 +155,7 @@ function BookList() {
       </div>
 
       {/* Shopping Cart Modal */}
-      {showCart && (
+      {showCart && !isAdmin && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
@@ -264,13 +269,15 @@ function BookList() {
                 </span>
               </div>
 
-              <button
-                onClick={() => addToCart(book)}
-                disabled={book.stockQuantity === 0}
-                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
-              >
-                {book.stockQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}
-              </button>
+              {!isAdmin && (
+                <button
+                  onClick={() => addToCart(book)}
+                  disabled={book.stockQuantity === 0}
+                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                >
+                  {book.stockQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+                </button>
+              )}
             </div>
           </div>
         ))}

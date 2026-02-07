@@ -80,11 +80,19 @@ public class OrdersController : ControllerBase
             return Unauthorized();
 
         var userId = int.Parse(userIdClaim.Value);
-        var result = await _orderService.CancelOrderAsync(id, userId);
         
-        if (!result)
-            return NotFound();
-        
-        return NoContent();
+        try
+        {
+            var result = await _orderService.CancelOrderAsync(id, userId);
+            
+            if (!result)
+                return NotFound();
+            
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
