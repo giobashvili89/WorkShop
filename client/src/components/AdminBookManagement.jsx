@@ -50,7 +50,8 @@ function AdminBookManagement() {
         uploadFormData.append('file', coverFile);
 
         const token = localStorage.getItem('token');
-        const uploadResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/books/upload-cover`, {
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const uploadResponse = await fetch(`${API_BASE_URL}/books/upload-cover`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -276,7 +277,7 @@ function AdminBookManagement() {
                 <div className="mt-2">
                   <p className="text-sm text-gray-600">Current cover:</p>
                   <img 
-                    src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${formData.coverImagePath}`} 
+                    src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${formData.coverImagePath}`} 
                     alt="Current cover" 
                     className="mt-1 h-32 object-cover rounded"
                   />

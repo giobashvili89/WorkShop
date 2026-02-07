@@ -229,7 +229,7 @@ function BookList() {
             {book.coverImagePath && !imageErrors[book.id] ? (
               <div className="h-48 overflow-hidden">
                 <img 
-                  src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${book.coverImagePath}`}
+                  src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${book.coverImagePath}`}
                   alt={book.title}
                   className="w-full h-full object-cover"
                   onError={() => {

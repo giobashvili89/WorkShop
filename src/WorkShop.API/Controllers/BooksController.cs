@@ -97,8 +97,16 @@ public class BooksController : ControllerBase
         if (file.Length > 5 * 1024 * 1024)
             return BadRequest("File size cannot exceed 5MB");
 
+        // Get web root path
+        var webRootPath = _environment.WebRootPath;
+        if (string.IsNullOrEmpty(webRootPath))
+        {
+            webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            Directory.CreateDirectory(webRootPath);
+        }
+
         // Create uploads directory if it doesn't exist
-        var uploadsFolder = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads", "covers");
+        var uploadsFolder = Path.Combine(webRootPath, "uploads", "covers");
         Directory.CreateDirectory(uploadsFolder);
 
         // Generate unique filename
