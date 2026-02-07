@@ -12,6 +12,7 @@ function BookList() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categories, setCategories] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
+  const [visibleCount, setVisibleCount] = useState(10);
 
   useEffect(() => {
     loadBooks();
@@ -34,6 +35,31 @@ function BookList() {
       setLoading(false);
     }
   };
+
+  const filteredBooks = selectedCategory === 'All' 
+    ? books 
+    : books.filter(book => book.category === selectedCategory);
+
+  const visibleBooks = filteredBooks.slice(0, visibleCount);
+
+  useEffect(() => {
+    // Reset visible count when category changes
+    setVisibleCount(10);
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.documentElement.scrollHeight - 200;
+      
+      if (scrollPosition >= threshold && visibleCount < filteredBooks.length) {
+        setVisibleCount(prev => Math.min(prev + 10, filteredBooks.length));
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [visibleCount, filteredBooks.length]);
 
   const addToCart = (book) => {
     const existingItem = cart.find(item => item.bookId === book.id);
@@ -93,10 +119,6 @@ function BookList() {
       alert('Failed to place order: ' + err.message);
     }
   };
-
-  const filteredBooks = selectedCategory === 'All' 
-    ? books 
-    : books.filter(book => book.category === selectedCategory);
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.book.price * item.quantity), 0);
 
@@ -226,7 +248,7 @@ function BookList() {
 
       {/* Books Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredBooks.map(book => (
+        {visibleBooks.map(book => (
           <div
             key={book.id}
             className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
@@ -282,6 +304,13 @@ function BookList() {
           </div>
         ))}
       </div>
+
+      {/* Show message when all books are loaded */}
+      {visibleCount >= filteredBooks.length && filteredBooks.length > 10 && (
+        <div className="text-center py-8 text-gray-500">
+          All {filteredBooks.length} books loaded
+        </div>
+      )}
 
       {filteredBooks.length === 0 && (
         <div className="text-center py-12 text-gray-500">

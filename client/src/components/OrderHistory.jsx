@@ -113,7 +113,12 @@ function OrderHistory() {
                         </p>
                       </div>
                       <p className="font-semibold">${item.totalPrice.toFixed(2)}</p>
-               !isAdmin && order.canCancel && (
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {!isAdmin && order.canCancel && (
                 <div className="mt-4 border-t pt-4">
                   <div className="flex justify-between items-center">
                     <p className="text-sm text-gray-600">
@@ -133,12 +138,7 @@ function OrderHistory() {
                 <div className="mt-4 border-t pt-4">
                   <p className="text-sm text-gray-500 italic">
                     ⚠️ Cancellation period (1 hour) has expired for this order
-                  </p
-                    onClick={() => handleCancelOrder(order.id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-                  >
-                    Cancel Order
-                  </button>
+                  </p>
                 </div>
               )}
             </div>
