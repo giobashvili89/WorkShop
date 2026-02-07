@@ -7,6 +7,9 @@ function AdminBookManagement() {
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [coverFile, setCoverFile] = useState(null);
+  const itemsPerPage = 20;
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -15,7 +18,8 @@ function AdminBookManagement() {
     isbn: '',
     price: '',
     stockQuantity: '',
-    publishedDate: ''
+    publishedDate: '',
+    coverImagePath: ''
   });
 
   useEffect(() => {
@@ -38,11 +42,37 @@ function AdminBookManagement() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let coverImagePath = formData.coverImagePath;
+
+      // Upload cover image if a new file is selected
+      if (coverFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', coverFile);
+
+        const token = localStorage.getItem('token');
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const uploadResponse = await fetch(`${API_BASE_URL}/books/upload-cover`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: uploadFormData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload cover image');
+        }
+
+        const uploadData = await uploadResponse.json();
+        coverImagePath = uploadData.path;
+      }
+
       const bookData = {
         ...formData,
         price: parseFloat(formData.price),
         stockQuantity: parseInt(formData.stockQuantity),
-        publishedDate: new Date(formData.publishedDate).toISOString()
+        publishedDate: new Date(formData.publishedDate).toISOString(),
+        coverImagePath
       };
 
       if (editingBook) {
@@ -53,6 +83,7 @@ function AdminBookManagement() {
 
       setShowForm(false);
       setEditingBook(null);
+      setCoverFile(null);
       resetForm();
       loadBooks();
     } catch (err) {
@@ -70,8 +101,10 @@ function AdminBookManagement() {
       isbn: book.isbn,
       price: book.price.toString(),
       stockQuantity: book.stockQuantity.toString(),
-      publishedDate: book.publishedDate.split('T')[0]
+      publishedDate: book.publishedDate.split('T')[0],
+      coverImagePath: book.coverImagePath || ''
     });
+    setCoverFile(null);
     setShowForm(true);
   };
 
@@ -95,14 +128,27 @@ function AdminBookManagement() {
       isbn: '',
       price: '',
       stockQuantity: '',
-      publishedDate: ''
+      publishedDate: '',
+      coverImagePath: ''
     });
+    setCoverFile(null);
   };
 
   const handleCancel = () => {
     setShowForm(false);
     setEditingBook(null);
+    setCoverFile(null);
     resetForm();
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(books.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentBooks = books.slice(startIndex, endIndex);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   if (loading) {
@@ -219,6 +265,29 @@ function AdminBookManagement() {
               />
             </div>
 
+            <div className="md:col-span-2">
+              <label className="block text-gray-700 mb-2">Book Cover Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setCoverFile(e.target.files[0])}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {formData.coverImagePath && !coverFile && (
+                <div className="mt-2">
+                  <p className="text-sm text-gray-600">Current cover:</p>
+                  <img 
+                    src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${formData.coverImagePath}`} 
+                    alt="Current cover" 
+                    className="mt-1 h-32 object-cover rounded"
+                  />
+                </div>
+              )}
+              {coverFile && (
+                <p className="mt-2 text-sm text-green-600">New file selected: {coverFile.name}</p>
+              )}
+            </div>
+
             <div className="md:col-span-2 flex gap-4">
               <button
                 type="submit"
@@ -266,7 +335,7 @@ function AdminBookManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {books.map(book => (
+            {currentBooks.map(book => (
               <tr key={book.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{book.title}</div>
@@ -306,6 +375,90 @@ function AdminBookManagement() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center items-center gap-2">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            Previous
+          </button>
+          
+          <div className="flex gap-1">
+            {(() => {
+              const maxVisiblePages = 7;
+              const pages = [];
+              
+              if (totalPages <= maxVisiblePages) {
+                // Show all pages if total is small
+                for (let i = 1; i <= totalPages; i++) {
+                  pages.push(i);
+                }
+              } else {
+                // Show first page
+                pages.push(1);
+                
+                // Calculate range around current page
+                const startPage = Math.max(2, currentPage - 1);
+                const endPage = Math.min(totalPages - 1, currentPage + 1);
+                
+                // Add ellipsis if needed
+                if (startPage > 2) {
+                  pages.push('...');
+                }
+                
+                // Add pages around current
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(i);
+                }
+                
+                // Add ellipsis if needed
+                if (endPage < totalPages - 1) {
+                  pages.push('...');
+                }
+                
+                // Show last page
+                pages.push(totalPages);
+              }
+              
+              return pages.map((page, index) => 
+                page === '...' ? (
+                  <span key={`ellipsis-${index}`} className="px-2 py-2 text-gray-500">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-4 py-2 rounded-lg transition ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              );
+            })()}
+          </div>
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      <div className="mt-4 text-center text-sm text-gray-600">
+        Showing {startIndex + 1} to {Math.min(endIndex, books.length)} of {books.length} books
       </div>
     </div>
   );

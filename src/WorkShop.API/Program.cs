@@ -113,6 +113,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable static files for uploads
+app.UseStaticFiles();
+
 app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();

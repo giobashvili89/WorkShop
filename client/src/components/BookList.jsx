@@ -10,6 +10,7 @@ function BookList() {
   const [showCart, setShowCart] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categories, setCategories] = useState([]);
+  const [imageErrors, setImageErrors] = useState({});
 
   useEffect(() => {
     loadBooks();
@@ -225,12 +226,25 @@ function BookList() {
             key={book.id}
             className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
           >
-            <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-              <div className="text-white text-center px-4">
-                <div className="text-4xl mb-2">📚</div>
-                <div className="text-xs opacity-75">{book.category}</div>
+            {book.coverImagePath && !imageErrors[book.id] ? (
+              <div className="h-48 overflow-hidden">
+                <img 
+                  src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '')}${book.coverImagePath}`}
+                  alt={book.title}
+                  className="w-full h-full object-cover"
+                  onError={() => {
+                    setImageErrors(prev => ({ ...prev, [book.id]: true }));
+                  }}
+                />
               </div>
-            </div>
+            ) : (
+              <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                <div className="text-white text-center px-4">
+                  <div className="text-4xl mb-2">📚</div>
+                  <div className="text-xs opacity-75">{book.category}</div>
+                </div>
+              </div>
+            )}
             
             <div className="p-4">
               <h3 className="font-bold text-lg mb-2 text-gray-800 line-clamp-2">

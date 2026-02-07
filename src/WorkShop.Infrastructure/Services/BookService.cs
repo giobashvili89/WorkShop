@@ -30,7 +30,8 @@ public class BookService : IBookService
             Price = b.Price,
             StockQuantity = b.StockQuantity,
             SoldCount = b.SoldCount,
-            PublishedDate = b.PublishedDate
+            PublishedDate = b.PublishedDate,
+            CoverImagePath = b.CoverImagePath
         });
     }
 
@@ -51,7 +52,8 @@ public class BookService : IBookService
             Price = book.Price,
             StockQuantity = book.StockQuantity,
             SoldCount = book.SoldCount,
-            PublishedDate = book.PublishedDate
+            PublishedDate = book.PublishedDate,
+            CoverImagePath = book.CoverImagePath
         };
     }
 
@@ -72,7 +74,8 @@ public class BookService : IBookService
             Price = b.Price,
             StockQuantity = b.StockQuantity,
             SoldCount = b.SoldCount,
-            PublishedDate = b.PublishedDate
+            PublishedDate = b.PublishedDate,
+            CoverImagePath = b.CoverImagePath
         });
     }
 
@@ -93,7 +96,8 @@ public class BookService : IBookService
             Price = b.Price,
             StockQuantity = b.StockQuantity,
             SoldCount = b.SoldCount,
-            PublishedDate = b.PublishedDate
+            PublishedDate = b.PublishedDate,
+            CoverImagePath = b.CoverImagePath
         });
     }
 
@@ -110,7 +114,8 @@ public class BookService : IBookService
             StockQuantity = bookDto.StockQuantity,
             SoldCount = 0,
             PublishedDate = bookDto.PublishedDate,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            CoverImagePath = bookDto.CoverImagePath
         };
 
         _context.Books.Add(book);
@@ -127,7 +132,8 @@ public class BookService : IBookService
             Price = book.Price,
             StockQuantity = book.StockQuantity,
             SoldCount = book.SoldCount,
-            PublishedDate = book.PublishedDate
+            PublishedDate = book.PublishedDate,
+            CoverImagePath = book.CoverImagePath
         };
     }
 
@@ -145,6 +151,8 @@ public class BookService : IBookService
         book.Price = bookDto.Price;
         book.StockQuantity = bookDto.StockQuantity;
         book.PublishedDate = bookDto.PublishedDate;
+        if (bookDto.CoverImagePath != null)
+            book.CoverImagePath = bookDto.CoverImagePath;
 
         await _context.SaveChangesAsync();
 
@@ -159,7 +167,8 @@ public class BookService : IBookService
             Price = book.Price,
             StockQuantity = book.StockQuantity,
             SoldCount = book.SoldCount,
-            PublishedDate = book.PublishedDate
+            PublishedDate = book.PublishedDate,
+            CoverImagePath = book.CoverImagePath
         };
     }
 

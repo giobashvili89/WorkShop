@@ -10,4 +10,5 @@ public class BookRequestModel
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public DateTime PublishedDate { get; set; }
+    public string? CoverImagePath { get; set; }
 }

@@ -13,4 +13,5 @@ public class Book
     public int SoldCount { get; set; } = 0;
     public DateTime PublishedDate { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string? CoverImagePath { get; set; }
 }
