@@ -12,6 +12,11 @@ public class Order
     public DateTime? CompletedDate { get; set; }
     public bool EmailSent { get; set; } = false;
     
+    // Delivery information
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string AlternativePhoneNumber { get; set; } = string.Empty;
+    public string HomeAddress { get; set; } = string.Empty;
+    
     // Navigation property
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }
