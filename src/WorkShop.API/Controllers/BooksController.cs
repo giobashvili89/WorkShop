@@ -84,9 +84,12 @@ public class BooksController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded");
 
+        // Sanitize filename to prevent path traversal
+        var safeFileName = Path.GetFileName(file.FileName);
+        
         // Validate file type
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var extension = Path.GetExtension(safeFileName).ToLowerInvariant();
         if (!allowedExtensions.Contains(extension))
             return BadRequest("Invalid file type. Only images are allowed.");
 

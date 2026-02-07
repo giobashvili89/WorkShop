@@ -388,19 +388,62 @@ function AdminBookManagement() {
           </button>
           
           <div className="flex gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-4 py-2 rounded-lg transition ${
-                  currentPage === page
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {(() => {
+              const maxVisiblePages = 7;
+              const pages = [];
+              
+              if (totalPages <= maxVisiblePages) {
+                // Show all pages if total is small
+                for (let i = 1; i <= totalPages; i++) {
+                  pages.push(i);
+                }
+              } else {
+                // Show first page
+                pages.push(1);
+                
+                // Calculate range around current page
+                const startPage = Math.max(2, currentPage - 1);
+                const endPage = Math.min(totalPages - 1, currentPage + 1);
+                
+                // Add ellipsis if needed
+                if (startPage > 2) {
+                  pages.push('...');
+                }
+                
+                // Add pages around current
+                for (let i = startPage; i <= endPage; i++) {
+                  pages.push(i);
+                }
+                
+                // Add ellipsis if needed
+                if (endPage < totalPages - 1) {
+                  pages.push('...');
+                }
+                
+                // Show last page
+                pages.push(totalPages);
+              }
+              
+              return pages.map((page, index) => 
+                page === '...' ? (
+                  <span key={`ellipsis-${index}`} className="px-2 py-2 text-gray-500">
+                    ...
+                  </span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-4 py-2 rounded-lg transition ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              );
+            })()}
           </div>
 
           <button
