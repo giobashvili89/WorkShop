@@ -11,6 +11,9 @@ public class OrderResponseModel
     public DateTime OrderDate { get; set; }
     public DateTime? CompletedDate { get; set; }
     public bool CanCancel { get; set; } // Based on 1-hour rule
+    public string PhoneNumber { get; set; } = string.Empty;
+    public string AlternativePhoneNumber { get; set; } = string.Empty;
+    public string HomeAddress { get; set; } = string.Empty;
     public List<OrderItemResponseModel> Items { get; set; } = new();
 }
 

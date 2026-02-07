@@ -3,7 +3,7 @@ import { authService } from './authService';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 class OrderService {
-  async createOrder(items) {
+  async createOrder(items, deliveryInfo) {
     const token = authService.getToken();
     const response = await fetch(`${API_URL}/orders`, {
       method: 'POST',
@@ -11,7 +11,12 @@ class OrderService {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ items }),
+      body: JSON.stringify({ 
+        items,
+        phoneNumber: deliveryInfo.phoneNumber,
+        alternativePhoneNumber: deliveryInfo.alternativePhoneNumber,
+        homeAddress: deliveryInfo.homeAddress
+      }),
     });
 
     if (!response.ok) {

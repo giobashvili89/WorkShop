@@ -29,7 +29,10 @@ public class OrderService : IOrderService
                 UserId = userId,
                 OrderDate = DateTime.UtcNow,
                 Status = "Pending",
-                TrackingStatus = "Order Placed"
+                TrackingStatus = "Order Placed",
+                PhoneNumber = orderDto.PhoneNumber,
+                AlternativePhoneNumber = orderDto.AlternativePhoneNumber,
+                HomeAddress = orderDto.HomeAddress
             };
 
             decimal totalAmount = 0;
@@ -116,6 +119,9 @@ public class OrderService : IOrderService
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
             CanCancel = canCancel,
+            PhoneNumber = order.PhoneNumber,
+            AlternativePhoneNumber = order.AlternativePhoneNumber,
+            HomeAddress = order.HomeAddress,
             Items = order.OrderItems.Select(oi => new OrderItemResponseModel
             {
                 Id = oi.Id,
@@ -149,6 +155,9 @@ public class OrderService : IOrderService
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
             CanCancel = order.Status != "Cancelled" && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
+            PhoneNumber = order.PhoneNumber,
+            AlternativePhoneNumber = order.AlternativePhoneNumber,
+            HomeAddress = order.HomeAddress,
             Items = order.OrderItems.Select(oi => new OrderItemResponseModel
             {
                 Id = oi.Id,
@@ -181,6 +190,9 @@ public class OrderService : IOrderService
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
             CanCancel = order.Status != "Cancelled" && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
+            PhoneNumber = order.PhoneNumber,
+            AlternativePhoneNumber = order.AlternativePhoneNumber,
+            HomeAddress = order.HomeAddress,
             Items = order.OrderItems.Select(oi => new OrderItemResponseModel
             {
                 Id = oi.Id,
