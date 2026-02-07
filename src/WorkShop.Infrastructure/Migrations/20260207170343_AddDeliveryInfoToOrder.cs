@@ -29,19 +29,6 @@ namespace WorkShop.Infrastructure.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "CompletedDate",
-                table: "Orders",
-                type: "timestamp with time zone",
-                nullable: true);
-
-            migrationBuilder.AddColumn<bool>(
-                name: "EmailSent",
-                table: "Orders",
-                type: "boolean",
-                nullable: false,
-                defaultValue: false);
-
             migrationBuilder.AddColumn<string>(
                 name: "HomeAddress",
                 table: "Orders",
@@ -51,13 +38,6 @@ namespace WorkShop.Infrastructure.Migrations
 
             migrationBuilder.AddColumn<string>(
                 name: "PhoneNumber",
-                table: "Orders",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "TrackingStatus",
                 table: "Orders",
                 type: "text",
                 nullable: false,
@@ -76,23 +56,11 @@ namespace WorkShop.Infrastructure.Migrations
                 table: "Orders");
 
             migrationBuilder.DropColumn(
-                name: "CompletedDate",
-                table: "Orders");
-
-            migrationBuilder.DropColumn(
-                name: "EmailSent",
-                table: "Orders");
-
-            migrationBuilder.DropColumn(
                 name: "HomeAddress",
                 table: "Orders");
 
             migrationBuilder.DropColumn(
                 name: "PhoneNumber",
-                table: "Orders");
-
-            migrationBuilder.DropColumn(
-                name: "TrackingStatus",
                 table: "Orders");
 
             migrationBuilder.AddColumn<int>(

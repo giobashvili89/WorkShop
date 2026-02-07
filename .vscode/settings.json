@@ -1,6 +1,7 @@
 {
     "chat.tools.terminal.autoApprove": {
         "docker-compose": true,
-        "docker exec": true
+        "docker exec": true,
+        "dotnet ef": true
     }
 }
