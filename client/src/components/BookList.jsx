@@ -13,7 +13,6 @@ function BookList() {
   const [categories, setCategories] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
   const [visibleCount, setVisibleCount] = useState(10);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     loadBooks();
@@ -50,23 +49,17 @@ function BookList() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (isLoadingMore) return;
-      
       const scrollPosition = window.innerHeight + window.scrollY;
       const threshold = document.documentElement.scrollHeight - 200;
       
       if (scrollPosition >= threshold && visibleCount < filteredBooks.length) {
-        setIsLoadingMore(true);
-        setTimeout(() => {
-          setVisibleCount(prev => Math.min(prev + 10, filteredBooks.length));
-          setIsLoadingMore(false);
-        }, 500);
+        setVisibleCount(prev => Math.min(prev + 10, filteredBooks.length));
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [visibleCount, isLoadingMore, filteredBooks.length]);
+  }, [visibleCount, filteredBooks.length]);
 
   const addToCart = (book) => {
     const existingItem = cart.find(item => item.bookId === book.id);
@@ -312,15 +305,8 @@ function BookList() {
         ))}
       </div>
 
-      {/* Loading More Indicator */}
-      {isLoadingMore && (
-        <div className="text-center py-8">
-          <div className="text-gray-600">Loading more books...</div>
-        </div>
-      )}
-
       {/* Show message when all books are loaded */}
-      {!isLoadingMore && visibleCount >= filteredBooks.length && filteredBooks.length > 10 && (
+      {visibleCount >= filteredBooks.length && filteredBooks.length > 10 && (
         <div className="text-center py-8 text-gray-500">
           All {filteredBooks.length} books loaded
         </div>
