@@ -11,10 +11,12 @@ namespace WorkShop.API.Controllers;
 public class BooksController : ControllerBase
 {
     private readonly IBookService _bookService;
+    private readonly IWebHostEnvironment _environment;
 
-    public BooksController(IBookService bookService)
+    public BooksController(IBookService bookService, IWebHostEnvironment environment)
     {
         _bookService = bookService;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -73,5 +75,41 @@ public class BooksController : ControllerBase
         if (!result)
             return NotFound();
         return NoContent();
+    }
+
+    [HttpPost("upload-cover")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<string>> UploadCover(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded");
+
+        // Validate file type
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowedExtensions.Contains(extension))
+            return BadRequest("Invalid file type. Only images are allowed.");
+
+        // Validate file size (max 5MB)
+        if (file.Length > 5 * 1024 * 1024)
+            return BadRequest("File size cannot exceed 5MB");
+
+        // Create uploads directory if it doesn't exist
+        var uploadsFolder = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads", "covers");
+        Directory.CreateDirectory(uploadsFolder);
+
+        // Generate unique filename
+        var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        // Save file
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        // Return the relative path
+        var relativePath = $"/uploads/covers/{uniqueFileName}";
+        return Ok(new { path = relativePath });
     }
 }

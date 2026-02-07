@@ -12,4 +12,5 @@ public class BookResponseModel
     public int StockQuantity { get; set; }
     public int SoldCount { get; set; }
     public DateTime PublishedDate { get; set; }
+    public string? CoverImagePath { get; set; }
 }
