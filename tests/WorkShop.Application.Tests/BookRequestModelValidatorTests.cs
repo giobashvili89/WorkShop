@@ -66,29 +66,29 @@ public class BookRequestModelValidatorTests
     }
 
     [Fact]
-    public void Should_Have_Error_When_Category_Is_Empty()
+    public void Should_Have_Error_When_CategoryId_Is_Zero()
     {
-        var model = new BookRequestModel { Category = "" };
+        var model = new BookRequestModel { CategoryId = 0 };
         var result = _validator.TestValidate(model);
-        result.ShouldHaveValidationErrorFor(x => x.Category)
-            .WithErrorMessage("Category is required.");
+        result.ShouldHaveValidationErrorFor(x => x.CategoryId)
+            .WithErrorMessage("CategoryId must be greater than 0.");
     }
 
     [Fact]
-    public void Should_Have_Error_When_Category_Exceeds_MaxLength()
+    public void Should_Have_Error_When_CategoryId_Is_Negative()
     {
-        var model = new BookRequestModel { Category = new string('A', 51) };
+        var model = new BookRequestModel { CategoryId = -1 };
         var result = _validator.TestValidate(model);
-        result.ShouldHaveValidationErrorFor(x => x.Category)
-            .WithErrorMessage("Category cannot exceed 50 characters.");
+        result.ShouldHaveValidationErrorFor(x => x.CategoryId)
+            .WithErrorMessage("CategoryId must be greater than 0.");
     }
 
     [Fact]
-    public void Should_Not_Have_Error_When_Category_Is_Valid()
+    public void Should_Not_Have_Error_When_CategoryId_Is_Valid()
     {
-        var model = new BookRequestModel { Category = "Fiction" };
+        var model = new BookRequestModel { CategoryId = 1 };
         var result = _validator.TestValidate(model);
-        result.ShouldNotHaveValidationErrorFor(x => x.Category);
+        result.ShouldNotHaveValidationErrorFor(x => x.CategoryId);
     }
 
     [Fact]
@@ -235,7 +235,7 @@ public class BookRequestModelValidatorTests
         {
             Title = "The Great Gatsby",
             Author = "F. Scott Fitzgerald",
-            Category = "Classic Literature",
+            CategoryId = 1,
             Description = "A novel set in the Jazz Age that explores themes of wealth, love, and the American Dream.",
             ISBN = "978-0-7432-7356-5",
             Price = 15.99m,

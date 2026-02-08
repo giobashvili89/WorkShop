@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Book> Books { get; set; }
+    public DbSet<Category> Categories { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
@@ -27,13 +28,23 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Role).HasDefaultValue(UserRole.Customer);
         });
 
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Name).IsUnique();
+        });
+
         modelBuilder.Entity<Book>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Author);
-            entity.HasIndex(e => e.Category);
+            entity.HasIndex(e => e.CategoryId);
             entity.HasIndex(e => e.ISBN);
             entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
+            entity.HasOne(e => e.Category)
+                .WithMany(c => c.Books)
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Order>(entity =>

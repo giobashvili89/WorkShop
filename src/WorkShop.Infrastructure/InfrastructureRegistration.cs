@@ -20,6 +20,7 @@ public static class InfrastructureRegistration
 
         // Register services for dependency injection
         services.AddScoped<IBookService, BookService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IEmailService, EmailService>();

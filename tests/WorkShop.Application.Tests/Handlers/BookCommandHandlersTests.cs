@@ -18,7 +18,7 @@ public class BookCommandHandlersTests
         {
             Title = "New Book",
             Author = "Author",
-            Category = "Fiction",
+            CategoryId = 1,
             Description = "Description",
             ISBN = "1234567890",
             Price = 29.99m,
@@ -55,7 +55,7 @@ public class BookCommandHandlersTests
         {
             Title = "Updated Book",
             Author = "Author",
-            Category = "Fiction",
+            CategoryId = 1,
             Description = "Description",
             ISBN = "1234567890",
             Price = 29.99m,
@@ -92,7 +92,7 @@ public class BookCommandHandlersTests
         {
             Title = "Updated Book",
             Author = "Author",
-            Category = "Fiction",
+            CategoryId = 1,
             Description = "Description",
             ISBN = "1234567890",
             Price = 29.99m,

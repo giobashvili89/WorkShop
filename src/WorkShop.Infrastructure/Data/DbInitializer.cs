@@ -13,11 +13,14 @@ public static class DbInitializer
         await context.Database.MigrateAsync();
 
         // Check if data already exists (after migrations are applied)
-        if (await context.Books.AnyAsync())
+        if (await context.Categories.AnyAsync())
         {
             return;  
         }
 
+        // Seed Categories first
+        await SeedCategoriesAsync(context);
+        
         // Seed Books - 100 records
         await SeedBooksAsync(context);
 
@@ -27,9 +30,32 @@ public static class DbInitializer
         await context.SaveChangesAsync();
     }
 
+    private static async Task SeedCategoriesAsync(AppDbContext context)
+    {
+        var categories = new[]
+        {
+            new Category { Name = "Fiction", Description = "Fictional literature including novels and short stories" },
+            new Category { Name = "Non-Fiction", Description = "Factual books including biographies, history, and essays" },
+            new Category { Name = "Science", Description = "Scientific books covering various scientific disciplines" },
+            new Category { Name = "History", Description = "Historical books and documentation" },
+            new Category { Name = "Biography", Description = "Life stories and biographies of notable people" },
+            new Category { Name = "Technology", Description = "Books about technology, programming, and computing" },
+            new Category { Name = "Art", Description = "Books about art, design, and creativity" },
+            new Category { Name = "Philosophy", Description = "Philosophical texts and discussions" },
+            new Category { Name = "Self-Help", Description = "Personal development and self-improvement books" },
+            new Category { Name = "Mystery", Description = "Mystery and detective fiction" }
+        };
+
+        await context.Categories.AddRangeAsync(categories);
+        await context.SaveChangesAsync();
+    }
+
     private static async Task SeedBooksAsync(AppDbContext context)
     {
-        var categories = new[] { "Fiction", "Non-Fiction", "Science", "History", "Biography", "Technology", "Art", "Philosophy", "Self-Help", "Mystery" };
+        // Get all categories to use their IDs
+        var categories = await context.Categories.ToListAsync();
+        var categoryDict = categories.ToDictionary(c => c.Name, c => c.Id);
+        
         var authors = new[]
         {
             "George Orwell", "Jane Austen", "Mark Twain", "Charles Dickens", "Leo Tolstoy",
@@ -44,7 +70,7 @@ public static class DbInitializer
         for (int i = 1; i <= 100; i++)
         {
             var author = authors[random.Next(authors.Length)];
-            var category = categories[random.Next(categories.Length)];
+            var category = categories[random.Next(categories.Count)];
             var publishedYear = random.Next(1900, 2024);
             var publishedMonth = random.Next(1, 13);
             var daysInMonth = DateTime.DaysInMonth(publishedYear, publishedMonth);
@@ -52,11 +78,11 @@ public static class DbInitializer
 
             books.Add(new Book
             {
-                Title = $"{category} Book {i}",
+                Title = $"{category.Name} Book {i}",
                 Author = author,
-                Category = category,
-                Description = $"This is a comprehensive {category.ToLower()} book written by {author}. " +
-                             $"It covers various aspects of {category.ToLower()} and provides valuable insights. " +
+                CategoryId = category.Id,
+                Description = $"This is a comprehensive {category.Name.ToLower()} book written by {author}. " +
+                             $"It covers various aspects of {category.Name.ToLower()} and provides valuable insights. " +
                              $"Published in {publishedYear}, this work has been influential in its field.",
                 ISBN = $"978-{random.Next(1000000000, 2000000000)}", // Mock ISBN for demo purposes
                 Price = Math.Round((decimal)(random.NextDouble() * 50 + 9.99), 2), // Price between $9.99 and $59.99

@@ -15,9 +15,8 @@ public class BookRequestModelValidator : AbstractValidator<BookRequestModel>
             .NotEmpty().WithMessage("Author is required.")
             .MaximumLength(100).WithMessage("Author cannot exceed 100 characters.");
 
-        RuleFor(x => x.Category)
-            .NotEmpty().WithMessage("Category is required.")
-            .MaximumLength(50).WithMessage("Category cannot exceed 50 characters.");
+        RuleFor(x => x.CategoryId)
+            .GreaterThan(0).WithMessage("CategoryId must be greater than 0.");
 
         RuleFor(x => x.Description)
             .MaximumLength(1000).WithMessage("Description cannot exceed 1000 characters.");
