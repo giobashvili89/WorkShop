@@ -5,4 +5,9 @@
     <Project Path="src/WorkShop.Domain/WorkShop.Domain.csproj" />
     <Project Path="src/WorkShop.Infrastructure/WorkShop.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WorkShop.API.Tests/WorkShop.API.Tests.csproj" />
+    <Project Path="tests/WorkShop.Application.Tests/WorkShop.Application.Tests.csproj" />
+    <Project Path="tests/WorkShop.Infrastructure.Tests/WorkShop.Infrastructure.Tests.csproj" />
+  </Folder>
 </Solution>
