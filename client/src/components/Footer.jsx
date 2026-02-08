@@ -37,6 +37,7 @@ function Footer() {
                 href="https://facebook.com/bookshop"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Facebook page (opens in new tab)"
                 className="flex items-center space-x-2 text-gray-100 hover:text-white hover:underline transition"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -48,6 +49,7 @@ function Footer() {
                 href="https://instagram.com/bookshop"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit our Instagram page (opens in new tab)"
                 className="flex items-center space-x-2 text-gray-100 hover:text-white hover:underline transition"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
