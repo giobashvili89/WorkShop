@@ -208,7 +208,6 @@ namespace WorkShop.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("IsBlocked")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
