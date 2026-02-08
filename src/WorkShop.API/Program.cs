@@ -14,27 +14,20 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
-// Add FluentValidation Auto-Validation
 builder.Services.AddFluentValidationAutoValidation();
 
-// Add Application Services (FluentValidation Validators and MediatR)
 builder.Services.AddApplicationServices();
 
-// Add Swagger Configuration
 builder.Services.AddSwaggerConfiguration();
 
-// Add CORS Configuration
 builder.Services.AddCorsConfiguration();
 
-// Add Infrastructure Services (Database and Services)
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// Add JWT Authentication
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
-// Initialize database and seed data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -50,12 +43,10 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         logger.LogError(ex, "An error occurred while initializing the database.");
-        throw; // Rethrow to prevent app from starting with broken database
+        throw;  
     }
 }
 
-// Configure the HTTP request pipeline.
-// Add global exception handler middleware
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -76,5 +67,4 @@ app.MapControllers();
 
 app.Run();
 
-// Make the implicit Program class public and partial for testing
 public partial class Program { }

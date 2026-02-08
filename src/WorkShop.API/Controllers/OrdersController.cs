@@ -47,7 +47,6 @@ public class OrdersController : ControllerBase
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
         
-        // Users can only see their own orders unless they're admin
         if (userRole != "Admin" && userIdClaim != null && order.UserId != int.Parse(userIdClaim.Value))
             return Forbid();
 
