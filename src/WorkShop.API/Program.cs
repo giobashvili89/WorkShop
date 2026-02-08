@@ -18,6 +18,10 @@ builder.Services.AddControllers();
 // Add FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<BookRequestModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<OrderRequestModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateDeliveryInfoRequestModelValidator>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

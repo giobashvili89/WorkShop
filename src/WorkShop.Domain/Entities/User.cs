@@ -9,6 +9,5 @@ public class User
     public string Role { get; set; } = "Customer"; // Admin or Customer
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    // Navigation property for orders
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

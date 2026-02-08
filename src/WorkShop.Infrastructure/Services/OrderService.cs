@@ -49,7 +49,7 @@ public class OrderService : IOrderService
                 if (book.StockQuantity < itemDto.Quantity)
                 {
                     await transaction.RollbackAsync();
-                    return null; // Not enough stock
+                    return null;
                 }
 
                 var orderItem = new OrderItem
@@ -63,7 +63,6 @@ public class OrderService : IOrderService
                 order.OrderItems.Add(orderItem);
                 totalAmount += orderItem.TotalPrice;
 
-                // Update book stock and sold count
                 book.StockQuantity -= itemDto.Quantity;
                 book.SoldCount += itemDto.Quantity;
             }
@@ -76,7 +75,6 @@ public class OrderService : IOrderService
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            // Send order confirmation email
             var user = await _context.Users.FindAsync(userId);
             if (user != null)
             {
@@ -247,7 +245,6 @@ public class OrderService : IOrderService
         if (order == null || order.Status == "Cancelled")
             return false;
 
-        // Check if order is within 1 hour cancellation window
         var hoursSinceOrder = (DateTime.UtcNow - order.OrderDate).TotalHours;
         if (hoursSinceOrder > 1)
         {
@@ -258,7 +255,6 @@ public class OrderService : IOrderService
         
         try
         {
-            // Restore book stock
             foreach (var item in order.OrderItems)
             {
                 item.Book.StockQuantity += item.Quantity;
@@ -269,7 +265,6 @@ public class OrderService : IOrderService
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            // Send cancellation email
             await _emailService.SendOrderCancellationEmailAsync(order, order.User);
 
             return true;
@@ -292,7 +287,6 @@ public class OrderService : IOrderService
         if (order == null)
             return null;
 
-        // Update fields only if provided
         if (!string.IsNullOrEmpty(model.TrackingStatus))
             order.TrackingStatus = model.TrackingStatus;
 
@@ -310,7 +304,6 @@ public class OrderService : IOrderService
 
         await _context.SaveChangesAsync();
 
-        // Send email notification if requested
         if (model.SendEmail)
         {
             await _emailService.SendOrderStatusUpdateEmailAsync(order, order.User);

@@ -26,11 +26,9 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseModel?> RegisterAsync(RegisterRequestModel registerDto)
     {
-        // Check if user already exists
         if (await _context.Users.AnyAsync(u => u.Username == registerDto.Username || u.Email == registerDto.Email))
             return null;
 
-        // Hash the password with PBKDF2
         var passwordHash = PasswordHasher.HashPassword(registerDto.Password);
 
         var user = new User
@@ -38,7 +36,7 @@ public class AuthService : IAuthService
             Username = registerDto.Username,
             Email = registerDto.Email,
             PasswordHash = passwordHash,
-            Role = "Customer", // Default role for new registrations
+            Role = "Customer", 
             CreatedAt = DateTime.UtcNow
         };
 
