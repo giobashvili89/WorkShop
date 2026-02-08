@@ -82,7 +82,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Register services for dependency injection
-builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();

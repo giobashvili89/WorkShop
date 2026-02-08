@@ -11,7 +11,6 @@ public class AppDbContext : DbContext
 
     public DbSet<Book> Books { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<Product> Products { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
 
@@ -34,11 +33,6 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.Category);
             entity.HasIndex(e => e.ISBN);
             entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
-        });
-
-        modelBuilder.Entity<Product>(entity =>
-        {
-            entity.HasKey(e => e.Id);
         });
 
         modelBuilder.Entity<Order>(entity =>
