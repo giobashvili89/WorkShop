@@ -80,10 +80,8 @@ public class BooksController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded");
 
-        // Sanitize filename to prevent path traversal
         var safeFileName = Path.GetFileName(file.FileName);
         
-        // Validate file type
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
         var extension = Path.GetExtension(safeFileName).ToLowerInvariant();
         if (!allowedExtensions.Contains(extension))
@@ -93,7 +91,6 @@ public class BooksController : ControllerBase
         if (file.Length > 5 * 1024 * 1024)
             return BadRequest("File size cannot exceed 5MB");
 
-        // Get web root path
         var webRootPath = _environment.WebRootPath;
         if (string.IsNullOrEmpty(webRootPath))
         {
@@ -101,21 +98,17 @@ public class BooksController : ControllerBase
             Directory.CreateDirectory(webRootPath);
         }
 
-        // Create uploads directory if it doesn't exist
         var uploadsFolder = Path.Combine(webRootPath, "uploads", "covers");
         Directory.CreateDirectory(uploadsFolder);
 
-        // Generate unique filename
         var uniqueFileName = $"{Guid.NewGuid()}{extension}";
         var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-        // Save file
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
 
-        // Return the relative path
         var relativePath = $"/uploads/covers/{uniqueFileName}";
         return Ok(new { path = relativePath });
     }

@@ -10,7 +10,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-workshop_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pwd}
     ports:
       - "5432:5432"
     volumes:
@@ -31,7 +31,7 @@ services:
     container_name: workshop-api
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-workshop_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-gio}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-workshop_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-pwd}
       - Jwt__Secret=${JWT_SECRET:-TspLpyXwIIoeBXvS3eePXezNJTpR7OKX8Hs22eLfo45}
       - Jwt__Issuer=${JWT_ISSUER:-WorkShopAPI}
       - Jwt__Audience=${JWT_AUDIENCE:-WorkShopClient}

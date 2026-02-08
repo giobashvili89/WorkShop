@@ -37,7 +37,6 @@ public class GlobalExceptionHandlerMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        // Log the exception
         _logger.LogError(exception, "An unhandled exception occurred: {Message}", exception.Message);
 
         context.Response.ContentType = "application/json";
@@ -69,13 +68,11 @@ public class GlobalExceptionHandlerMiddleware
 
     private string GetErrorMessage(Exception exception)
     {
-        // In production, hide internal error details from users
         if (_environment.IsProduction())
         {
             return "An internal server error occurred. Please try again later.";
         }
 
-        // In development, return the actual error message for debugging
         return exception.Message;
     }
 }
