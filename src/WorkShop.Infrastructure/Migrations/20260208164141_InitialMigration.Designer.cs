@@ -211,7 +211,9 @@ namespace WorkShop.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("IsBlocked")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
