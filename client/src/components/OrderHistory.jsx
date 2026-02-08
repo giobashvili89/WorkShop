@@ -9,21 +9,32 @@ function OrderHistory() {
   const isAdmin = authService.isAdmin();
 
   useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        setLoading(true);
+        const data = isAdmin 
+          ? await orderService.getAllOrders()
+          : await orderService.getMyOrders();
+        setOrders(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     loadOrders();
-  }, []);
+  }, [isAdmin]);
 
-  const loadOrders = async () => {
+  const reloadOrders = async () => {
     try {
-      setLoading(true);
       const data = isAdmin 
         ? await orderService.getAllOrders()
         : await orderService.getMyOrders();
       setOrders(data);
-      setError(null);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -33,7 +44,7 @@ function OrderHistory() {
     try {
       await orderService.cancelOrder(orderId);
       alert('Order cancelled successfully! A confirmation email has been sent.');
-      loadOrders();
+      await reloadOrders();
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message;
       alert('Failed to cancel order: ' + errorMessage);

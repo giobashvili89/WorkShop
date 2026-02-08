@@ -5,7 +5,7 @@ using WorkShop.Domain.Entities;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
 
-namespace WorkShop.API.Tests;
+namespace WorkShop.Infrastructure.Tests;
 
 public class BookServiceTests
 {

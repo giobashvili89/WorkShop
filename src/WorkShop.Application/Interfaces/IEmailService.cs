@@ -6,4 +6,5 @@ public interface IEmailService
 {
     Task SendOrderConfirmationEmailAsync(Order order, User user);
     Task SendOrderCancellationEmailAsync(Order order, User user);
+    Task SendOrderStatusUpdateEmailAsync(Order order, User user);
 }

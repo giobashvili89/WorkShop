@@ -89,6 +89,40 @@ public class EmailService : IEmailService
         }
     }
 
+    public async Task SendOrderStatusUpdateEmailAsync(Order order, User user)
+    {
+        try
+        {
+            var subject = $"Order Status Update - Order #{order.Id}";
+            var body = $@"
+                <html>
+                <body>
+                    <h2>Order Status Update</h2>
+                    <p>Dear {user.Username},</p>
+                    <p>Your order status has been updated.</p>
+                    <h3>Updated Order Details:</h3>
+                    <ul>
+                        <li>Order Number: #{order.Id}</li>
+                        <li>Order Date: {order.OrderDate:yyyy-MM-dd HH:mm}</li>
+                        <li>Total Amount: ${order.TotalAmount:F2}</li>
+                        <li>Status: {order.Status}</li>
+                        <li>Tracking Status: {order.TrackingStatus}</li>
+                    </ul>
+                    <p>Thank you for your patience!</p>
+                    <p>If you have any questions, please contact our support team.</p>
+                </body>
+                </html>";
+
+            await SendEmailAsync(user.Email, subject, body);
+            _logger.LogInformation($"Order status update email sent to {user.Email} for order #{order.Id}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Failed to send order status update email for order #{order.Id}");
+            // Don't throw - email failure shouldn't break the update process
+        }
+    }
+
     private async Task SendEmailAsync(string toEmail, string subject, string body)
     {
         var smtpSettings = _configuration.GetSection("SmtpSettings");
