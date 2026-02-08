@@ -10,6 +10,7 @@ using WorkShop.Application.Models.Response;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
 using WorkShop.Domain.Enums;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 
 namespace WorkShop.Infrastructure.Services;
@@ -28,7 +29,7 @@ public class AuthService : IAuthService
     public async Task<AuthResponseModel?> RegisterAsync(RegisterRequestModel registerDto)
     {
         if (await _context.Users.AnyAsync(u => u.Username == registerDto.Username || u.Email == registerDto.Email))
-            return null;
+            throw new BadRequestException("User with this username or email already exists.");
 
         var passwordHash = PasswordHasher.HashPassword(registerDto.Password);
 
@@ -59,10 +60,10 @@ public class AuthService : IAuthService
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == loginDto.Username);
         if (user == null)
-            return null;
+            throw new UserNotFoundException(loginDto.Username);
 
         if (!PasswordHasher.VerifyPassword(loginDto.Password, user.PasswordHash))
-            return null;
+            throw new UnauthorizedException("Invalid username or password.");
 
         var token = GenerateJwtToken(user);
 

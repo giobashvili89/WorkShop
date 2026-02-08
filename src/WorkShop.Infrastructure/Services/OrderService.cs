@@ -4,6 +4,7 @@ using WorkShop.Application.Models.Response;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
 using WorkShop.Domain.Enums;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 
 namespace WorkShop.Infrastructure.Services;
@@ -44,13 +45,13 @@ public class OrderService : IOrderService
                 if (book == null)
                 {
                     await transaction.RollbackAsync();
-                    return null;
+                    throw new BookNotFoundException(itemDto.BookId);
                 }
 
                 if (book.StockQuantity < itemDto.Quantity)
                 {
                     await transaction.RollbackAsync();
-                    return null;
+                    throw new BadRequestException($"Insufficient stock for book '{book.Title}'. Available: {book.StockQuantity}, Requested: {itemDto.Quantity}");
                 }
 
                 var orderItem = new OrderItem
@@ -102,7 +103,7 @@ public class OrderService : IOrderService
             .FirstOrDefaultAsync(o => o.Id == orderId);
 
         if (order == null)
-            return null;
+            throw new OrderNotFoundException(orderId);
 
         var canCancel = order.Status != OrderStatus.Cancelled && 
                         (DateTime.UtcNow - order.OrderDate).TotalHours <= 1;
@@ -244,12 +245,12 @@ public class OrderService : IOrderService
             .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
 
         if (order == null || order.Status == OrderStatus.Cancelled)
-            return false;
+            throw new OrderNotFoundException(orderId);
 
         var hoursSinceOrder = (DateTime.UtcNow - order.OrderDate).TotalHours;
         if (hoursSinceOrder > 1)
         {
-            throw new InvalidOperationException("Order can only be cancelled within 1 hour of placement.");
+            throw new BadRequestException("Order can only be cancelled within 1 hour of placement.");
         }
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -286,7 +287,7 @@ public class OrderService : IOrderService
             .FirstOrDefaultAsync(o => o.Id == orderId);
 
         if (order == null)
-            return null;
+            throw new OrderNotFoundException(orderId);
 
         if (model.TrackingStatus.HasValue)
             order.TrackingStatus = model.TrackingStatus.Value;

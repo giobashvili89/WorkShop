@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
 
@@ -58,7 +59,7 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task RegisterAsync_ReturnsNull_WhenUsernameExists()
+    public async Task RegisterAsync_ThrowsBadRequestException_WhenUsernameExists()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -80,15 +81,14 @@ public class AuthServiceTests
             Password = "password123"
         };
 
-        // Act
-        var result = await service.RegisterAsync(registerDto);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            async () => await service.RegisterAsync(registerDto));
+        Assert.Equal("User with this username or email already exists.", exception.Message);
     }
 
     [Fact]
-    public async Task RegisterAsync_ReturnsNull_WhenEmailExists()
+    public async Task RegisterAsync_ThrowsBadRequestException_WhenEmailExists()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -110,11 +110,10 @@ public class AuthServiceTests
             Password = "password123"
         };
 
-        // Act
-        var result = await service.RegisterAsync(registerDto);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            async () => await service.RegisterAsync(registerDto));
+        Assert.Equal("User with this username or email already exists.", exception.Message);
     }
 
     [Fact]
@@ -150,7 +149,7 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task LoginAsync_ReturnsNull_WhenUserNotFound()
+    public async Task LoginAsync_ThrowsUserNotFoundException_WhenUserNotFound()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -163,15 +162,14 @@ public class AuthServiceTests
             Password = "password123"
         };
 
-        // Act
-        var result = await service.LoginAsync(loginDto);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<UserNotFoundException>(
+            async () => await service.LoginAsync(loginDto));
+        Assert.Equal("User with username 'nonexistentuser' was not found.", exception.Message);
     }
 
     [Fact]
-    public async Task LoginAsync_ReturnsNull_WhenPasswordIsIncorrect()
+    public async Task LoginAsync_ThrowsUnauthorizedException_WhenPasswordIsIncorrect()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -193,10 +191,9 @@ public class AuthServiceTests
             Password = "wrongpassword"
         };
 
-        // Act
-        var result = await service.LoginAsync(loginDto);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<UnauthorizedException>(
+            async () => await service.LoginAsync(loginDto));
+        Assert.Equal("Invalid username or password.", exception.Message);
     }
 }

@@ -4,6 +4,7 @@ using WorkShop.Application.Interfaces;
 using WorkShop.Application.Models.Request;
 using WorkShop.Domain.Entities;
 using WorkShop.Domain.Enums;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -67,7 +68,7 @@ public class OrderServiceTests
     }
 
     [Fact]
-    public async Task CreateOrderAsync_WithInsufficientStock_ShouldReturnNull()
+    public async Task CreateOrderAsync_WithInsufficientStock_ThrowsBadRequestException()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -91,16 +92,44 @@ public class OrderServiceTests
             HomeAddress = "123 Test Street"
         };
 
-        // Act
-        var result = await orderService.CreateOrderAsync(user.Id, orderRequest);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            async () => await orderService.CreateOrderAsync(user.Id, orderRequest));
+        Assert.Contains("Insufficient stock", exception.Message);
+        Assert.Contains("Test Book", exception.Message);
 
         // Verify stock was not changed
         var unchangedBook = await context.Books.FindAsync(book.Id);
         Assert.Equal(1, unchangedBook?.StockQuantity);
         Assert.Equal(0, unchangedBook?.SoldCount);
+    }
+
+    [Fact]
+    public async Task CreateOrderAsync_WithNonExistentBook_ThrowsBookNotFoundException()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var mockEmailService = new Mock<IEmailService>();
+        var orderService = new OrderService(context, mockEmailService.Object);
+
+        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        var orderRequest = new OrderRequestModel
+        {
+            Items = new List<OrderItemRequestModel>
+            {
+                new() { BookId = 999, Quantity = 1 }
+            },
+            PhoneNumber = "+1234567890",
+            HomeAddress = "123 Test Street"
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BookNotFoundException>(
+            async () => await orderService.CreateOrderAsync(user.Id, orderRequest));
+        Assert.Equal("Book with ID 999 was not found.", exception.Message);
     }
 
     [Fact]
@@ -241,7 +270,7 @@ public class OrderServiceTests
     }
 
     [Fact]
-    public async Task CancelOrderAsync_AfterOneHour_ShouldThrowException()
+    public async Task CancelOrderAsync_AfterOneHour_ThrowsBadRequestException()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -272,9 +301,27 @@ public class OrderServiceTests
         await context.SaveChangesAsync();
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => orderService.CancelOrderAsync(order.Id, user.Id)
-        );
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            async () => await orderService.CancelOrderAsync(order.Id, user.Id));
+        Assert.Equal("Order can only be cancelled within 1 hour of placement.", exception.Message);
+    }
+
+    [Fact]
+    public async Task CancelOrderAsync_WithNonExistentOrder_ThrowsOrderNotFoundException()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var mockEmailService = new Mock<IEmailService>();
+        var orderService = new OrderService(context, mockEmailService.Object);
+
+        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<OrderNotFoundException>(
+            async () => await orderService.CancelOrderAsync(999, user.Id));
+        Assert.Equal("Order with ID 999 was not found.", exception.Message);
     }
 
     [Fact]
@@ -328,5 +375,40 @@ public class OrderServiceTests
         var updatedOrder = await context.Orders.FindAsync(order.Id);
         Assert.Equal(TrackingStatus.InWarehouse, updatedOrder?.TrackingStatus);
         Assert.Equal(OrderStatus.Completed, updatedOrder?.Status);
+    }
+
+    [Fact]
+    public async Task UpdateDeliveryInfoAsync_ThrowsOrderNotFoundException_WhenOrderDoesNotExist()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var mockEmailService = new Mock<IEmailService>();
+        var orderService = new OrderService(context, mockEmailService.Object);
+
+        var updateModel = new UpdateDeliveryInfoRequestModel
+        {
+            TrackingStatus = TrackingStatus.InWarehouse,
+            Status = OrderStatus.Completed,
+            SendEmail = false
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<OrderNotFoundException>(
+            async () => await orderService.UpdateDeliveryInfoAsync(999, updateModel));
+        Assert.Equal("Order with ID 999 was not found.", exception.Message);
+    }
+
+    [Fact]
+    public async Task GetOrderByIdAsync_ThrowsOrderNotFoundException_WhenOrderDoesNotExist()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var mockEmailService = new Mock<IEmailService>();
+        var orderService = new OrderService(context, mockEmailService.Object);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<OrderNotFoundException>(
+            async () => await orderService.GetOrderByIdAsync(999));
+        Assert.Equal("Order with ID 999 was not found.", exception.Message);
     }
 }

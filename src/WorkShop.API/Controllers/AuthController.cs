@@ -21,8 +21,6 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponseModel>> Register([FromBody] RegisterRequestModel registerDto)
     {
         var result = await _mediator.Send(new RegisterCommand(registerDto));
-        if (result == null)
-            return BadRequest("User already exists");
         return Ok(result);
     }
 
@@ -30,8 +28,6 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponseModel>> Login([FromBody] LoginRequestModel loginDto)
     {
         var result = await _mediator.Send(new LoginCommand(loginDto));
-        if (result == null)
-            return Unauthorized("Invalid username or password");
         return Ok(result);
     }
 }

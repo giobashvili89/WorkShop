@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
 
@@ -65,17 +66,16 @@ public class BookServiceTests
     }
 
     [Fact]
-    public async Task GetBookByIdAsync_ReturnsNull_WhenBookNotFound()
+    public async Task GetBookByIdAsync_ThrowsBookNotFoundException_WhenBookNotFound()
     {
         // Arrange
         var context = GetInMemoryDbContext();
         var service = new BookService(context);
 
-        // Act
-        var result = await service.GetBookByIdAsync(999);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BookNotFoundException>(
+            async () => await service.GetBookByIdAsync(999));
+        Assert.Equal("Book with ID 999 was not found.", exception.Message);
     }
 
     [Fact]
@@ -133,6 +133,28 @@ public class BookServiceTests
     }
 
     [Fact]
+    public async Task UpdateBookAsync_ThrowsBookNotFoundException_WhenBookNotFound()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var service = new BookService(context);
+
+        var updatedDto = new BookRequestModel
+        {
+            Title = "Updated Title",
+            Author = "Updated Author",
+            CategoryId = 1,
+            Description = "Updated Desc",
+            PublishedDate = DateTime.UtcNow.AddDays(-1)
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BookNotFoundException>(
+            async () => await service.UpdateBookAsync(999, updatedDto));
+        Assert.Equal("Book with ID 999 was not found.", exception.Message);
+    }
+
+    [Fact]
     public async Task DeleteBookAsync_RemovesBook()
     {
         // Arrange
@@ -149,6 +171,19 @@ public class BookServiceTests
         Assert.True(result);
         var booksInDb = await context.Books.ToListAsync();
         Assert.Empty(booksInDb);
+    }
+
+    [Fact]
+    public async Task DeleteBookAsync_ThrowsBookNotFoundException_WhenBookNotFound()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var service = new BookService(context);
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BookNotFoundException>(
+            async () => await service.DeleteBookAsync(999));
+        Assert.Equal("Book with ID 999 was not found.", exception.Message);
     }
 
     [Fact]
