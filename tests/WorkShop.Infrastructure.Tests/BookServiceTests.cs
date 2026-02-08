@@ -14,7 +14,16 @@ public class BookServiceTests
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        return new AppDbContext(options);
+        var context = new AppDbContext(options);
+        
+        // Seed test categories
+        context.Categories.AddRange(
+            new Category { Id = 1, Name = "Fiction", Description = "Fiction books" },
+            new Category { Id = 2, Name = "Non-Fiction", Description = "Non-fiction books" }
+        );
+        context.SaveChanges();
+        
+        return context;
     }
 
     [Fact]
@@ -23,8 +32,8 @@ public class BookServiceTests
         // Arrange
         var context = GetInMemoryDbContext();
         context.Books.AddRange(
-            new Book { Id = 1, Title = "Book 1", Author = "Author 1", Category = "Fiction", Description = "Desc 1", PublishedDate = DateTime.UtcNow },
-            new Book { Id = 2, Title = "Book 2", Author = "Author 2", Category = "Non-Fiction", Description = "Desc 2", PublishedDate = DateTime.UtcNow }
+            new Book { Id = 1, Title = "Book 1", Author = "Author 1", CategoryId = 1, Description = "Desc 1", PublishedDate = DateTime.UtcNow },
+            new Book { Id = 2, Title = "Book 2", Author = "Author 2", CategoryId = 2, Description = "Desc 2", PublishedDate = DateTime.UtcNow }
         );
         await context.SaveChangesAsync();
         var service = new BookService(context);
@@ -41,7 +50,7 @@ public class BookServiceTests
     {
         // Arrange
         var context = GetInMemoryDbContext();
-        var book = new Book { Id = 1, Title = "Test Book", Author = "Test Author", Category = "Test Category", Description = "Test Desc", PublishedDate = DateTime.UtcNow };
+        var book = new Book { Id = 1, Title = "Test Book", Author = "Test Author", CategoryId = 1, Description = "Test Desc", PublishedDate = DateTime.UtcNow };
         context.Books.Add(book);
         await context.SaveChangesAsync();
         var service = new BookService(context);
@@ -79,7 +88,7 @@ public class BookServiceTests
         {
             Title = "New Book",
             Author = "New Author",
-            Category = "Fiction",
+            CategoryId = 1,
             Description = "New Description",
             PublishedDate = DateTime.UtcNow.AddDays(-1)
         };
@@ -100,7 +109,7 @@ public class BookServiceTests
     {
         // Arrange
         var context = GetInMemoryDbContext();
-        var book = new Book { Id = 1, Title = "Old Title", Author = "Old Author", Category = "Old Category", Description = "Old Desc", PublishedDate = DateTime.UtcNow };
+        var book = new Book { Id = 1, Title = "Old Title", Author = "Old Author", CategoryId = 1, Description = "Old Desc", PublishedDate = DateTime.UtcNow };
         context.Books.Add(book);
         await context.SaveChangesAsync();
         var service = new BookService(context);
@@ -109,7 +118,7 @@ public class BookServiceTests
         {
             Title = "Updated Title",
             Author = "Updated Author",
-            Category = "Updated Category",
+            CategoryId = 2,
             Description = "Updated Desc",
             PublishedDate = DateTime.UtcNow.AddDays(-1)
         };
@@ -128,7 +137,7 @@ public class BookServiceTests
     {
         // Arrange
         var context = GetInMemoryDbContext();
-        var book = new Book { Id = 1, Title = "Book to Delete", Author = "Author", Category = "Category", Description = "Desc", PublishedDate = DateTime.UtcNow };
+        var book = new Book { Id = 1, Title = "Book to Delete", Author = "Author", CategoryId = 1, Description = "Desc", PublishedDate = DateTime.UtcNow };
         context.Books.Add(book);
         await context.SaveChangesAsync();
         var service = new BookService(context);
@@ -148,9 +157,9 @@ public class BookServiceTests
         // Arrange
         var context = GetInMemoryDbContext();
         context.Books.AddRange(
-            new Book { Id = 1, Title = "Book 1", Author = "John Doe", Category = "Fiction", Description = "Desc 1", PublishedDate = DateTime.UtcNow },
-            new Book { Id = 2, Title = "Book 2", Author = "Jane Smith", Category = "Non-Fiction", Description = "Desc 2", PublishedDate = DateTime.UtcNow },
-            new Book { Id = 3, Title = "Book 3", Author = "John Doe", Category = "Fiction", Description = "Desc 3", PublishedDate = DateTime.UtcNow }
+            new Book { Id = 1, Title = "Book 1", Author = "John Doe", CategoryId = 1, Description = "Desc 1", PublishedDate = DateTime.UtcNow },
+            new Book { Id = 2, Title = "Book 2", Author = "Jane Smith", CategoryId = 2, Description = "Desc 2", PublishedDate = DateTime.UtcNow },
+            new Book { Id = 3, Title = "Book 3", Author = "John Doe", CategoryId = 1, Description = "Desc 3", PublishedDate = DateTime.UtcNow }
         );
         await context.SaveChangesAsync();
         var service = new BookService(context);
@@ -168,10 +177,17 @@ public class BookServiceTests
     {
         // Arrange
         var context = GetInMemoryDbContext();
+        // Add specific categories for this test
+        context.Categories.AddRange(
+            new Category { Id = 3, Name = "Science", Description = "Science books" },
+            new Category { Id = 4, Name = "History", Description = "History books" }
+        );
+        context.SaveChanges();
+        
         context.Books.AddRange(
-            new Book { Id = 1, Title = "Book 1", Author = "Author 1", Category = "Science", Description = "Desc 1", PublishedDate = DateTime.UtcNow },
-            new Book { Id = 2, Title = "Book 2", Author = "Author 2", Category = "History", Description = "Desc 2", PublishedDate = DateTime.UtcNow },
-            new Book { Id = 3, Title = "Book 3", Author = "Author 3", Category = "Science", Description = "Desc 3", PublishedDate = DateTime.UtcNow }
+            new Book { Id = 1, Title = "Book 1", Author = "Author 1", CategoryId = 3, Description = "Desc 1", PublishedDate = DateTime.UtcNow },
+            new Book { Id = 2, Title = "Book 2", Author = "Author 2", CategoryId = 4, Description = "Desc 2", PublishedDate = DateTime.UtcNow },
+            new Book { Id = 3, Title = "Book 3", Author = "Author 3", CategoryId = 3, Description = "Desc 3", PublishedDate = DateTime.UtcNow }
         );
         await context.SaveChangesAsync();
         var service = new BookService(context);
@@ -181,6 +197,6 @@ public class BookServiceTests
 
         // Assert
         Assert.Equal(2, result.Count());
-        Assert.All(result, b => Assert.Contains("Science", b.Category));
+        Assert.All(result, b => Assert.Contains("Science", b.CategoryName));
     }
 }

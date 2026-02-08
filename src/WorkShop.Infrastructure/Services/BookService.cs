@@ -18,13 +18,16 @@ public class BookService : IBookService
 
     public async Task<IEnumerable<BookResponseModel>> GetAllBooksAsync()
     {
-        var books = await _context.Books.ToListAsync();
+        var books = await _context.Books
+            .Include(b => b.Category)
+            .ToListAsync();
         return books.Select(b => new BookResponseModel
         {
             Id = b.Id,
             Title = b.Title,
             Author = b.Author,
-            Category = b.Category,
+            CategoryId = b.CategoryId,
+            CategoryName = b.Category?.Name ?? string.Empty,
             Description = b.Description,
             ISBN = b.ISBN,
             Price = b.Price,
@@ -37,7 +40,9 @@ public class BookService : IBookService
 
     public async Task<BookResponseModel?> GetBookByIdAsync(int id)
     {
-        var book = await _context.Books.FindAsync(id);
+        var book = await _context.Books
+            .Include(b => b.Category)
+            .FirstOrDefaultAsync(b => b.Id == id);
         if (book == null)
             return null;
 
@@ -46,7 +51,8 @@ public class BookService : IBookService
             Id = book.Id,
             Title = book.Title,
             Author = book.Author,
-            Category = book.Category,
+            CategoryId = book.CategoryId,
+            CategoryName = book.Category?.Name ?? string.Empty,
             Description = book.Description,
             ISBN = book.ISBN,
             Price = book.Price,
@@ -60,6 +66,7 @@ public class BookService : IBookService
     public async Task<IEnumerable<BookResponseModel>> GetBooksByAuthorAsync(string author)
     {
         var books = await _context.Books
+            .Include(b => b.Category)
             .Where(b => b.Author.ToLower().Contains(author.ToLower()))
             .ToListAsync();
 
@@ -68,7 +75,8 @@ public class BookService : IBookService
             Id = b.Id,
             Title = b.Title,
             Author = b.Author,
-            Category = b.Category,
+            CategoryId = b.CategoryId,
+            CategoryName = b.Category?.Name ?? string.Empty,
             Description = b.Description,
             ISBN = b.ISBN,
             Price = b.Price,
@@ -82,7 +90,8 @@ public class BookService : IBookService
     public async Task<IEnumerable<BookResponseModel>> GetBooksByCategoryAsync(string category)
     {
         var books = await _context.Books
-            .Where(b => b.Category.ToLower().Contains(category.ToLower()))
+            .Include(b => b.Category)
+            .Where(b => b.Category != null && b.Category.Name.ToLower().Contains(category.ToLower()))
             .ToListAsync();
 
         return books.Select(b => new BookResponseModel
@@ -90,7 +99,8 @@ public class BookService : IBookService
             Id = b.Id,
             Title = b.Title,
             Author = b.Author,
-            Category = b.Category,
+            CategoryId = b.CategoryId,
+            CategoryName = b.Category?.Name ?? string.Empty,
             Description = b.Description,
             ISBN = b.ISBN,
             Price = b.Price,
@@ -107,7 +117,7 @@ public class BookService : IBookService
         {
             Title = bookDto.Title,
             Author = bookDto.Author,
-            Category = bookDto.Category,
+            CategoryId = bookDto.CategoryId,
             Description = bookDto.Description,
             ISBN = bookDto.ISBN,
             Price = bookDto.Price,
@@ -121,12 +131,16 @@ public class BookService : IBookService
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
+        // Load the category for the response
+        await _context.Entry(book).Reference(b => b.Category).LoadAsync();
+
         return new BookResponseModel
         {
             Id = book.Id,
             Title = book.Title,
             Author = book.Author,
-            Category = book.Category,
+            CategoryId = book.CategoryId,
+            CategoryName = book.Category?.Name ?? string.Empty,
             Description = book.Description,
             ISBN = book.ISBN,
             Price = book.Price,
@@ -139,13 +153,15 @@ public class BookService : IBookService
 
     public async Task<BookResponseModel?> UpdateBookAsync(int id, BookRequestModel bookDto)
     {
-        var book = await _context.Books.FindAsync(id);
+        var book = await _context.Books
+            .Include(b => b.Category)
+            .FirstOrDefaultAsync(b => b.Id == id);
         if (book == null)
             return null;
 
         book.Title = bookDto.Title;
         book.Author = bookDto.Author;
-        book.Category = bookDto.Category;
+        book.CategoryId = bookDto.CategoryId;
         book.Description = bookDto.Description;
         book.ISBN = bookDto.ISBN;
         book.Price = bookDto.Price;
@@ -156,12 +172,19 @@ public class BookService : IBookService
 
         await _context.SaveChangesAsync();
 
+        // Reload the category if it was changed
+        if (book.Category == null || book.Category.Id != book.CategoryId)
+        {
+            await _context.Entry(book).Reference(b => b.Category).LoadAsync();
+        }
+
         return new BookResponseModel
         {
             Id = book.Id,
             Title = book.Title,
             Author = book.Author,
-            Category = book.Category,
+            CategoryId = book.CategoryId,
+            CategoryName = book.Category?.Name ?? string.Empty,
             Description = book.Description,
             ISBN = book.ISBN,
             Price = book.Price,

@@ -102,8 +102,8 @@ public class BookQueryHandlersTests
         var mockBookService = new Mock<IBookService>();
         var expectedBooks = new List<BookResponseModel>
         {
-            new BookResponseModel { Id = 1, Title = "Book 1", Category = "Fiction" },
-            new BookResponseModel { Id = 2, Title = "Book 2", Category = "Fiction" }
+            new BookResponseModel { Id = 1, Title = "Book 1", CategoryId = 1, CategoryName = "Fiction" },
+            new BookResponseModel { Id = 2, Title = "Book 2", CategoryId = 1, CategoryName = "Fiction" }
         };
         mockBookService.Setup(s => s.GetBooksByCategoryAsync("Fiction")).ReturnsAsync(expectedBooks);
         
