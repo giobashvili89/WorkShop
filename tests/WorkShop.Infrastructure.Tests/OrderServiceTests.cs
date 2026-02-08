@@ -8,7 +8,7 @@ using WorkShop.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace WorkShop.API.Tests;
+namespace WorkShop.Infrastructure.Tests;
 
 public class OrderServiceTests
 {
