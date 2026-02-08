@@ -13,8 +13,10 @@ function Header({ onLogout }) {
   };
 
   const navLinkClass = ({ isActive }) =>
-    `px-4 py-2 rounded-lg transition text-white ${
-      isActive ? 'bg-blue-700' : 'bg-blue-600 hover:bg-blue-500'
+    `px-4 py-2 rounded-lg transition ${
+      isActive 
+        ? 'bg-blue-700 text-white' 
+        : 'text-white hover:bg-white hover:text-blue-600'
     }`;
 
   return (

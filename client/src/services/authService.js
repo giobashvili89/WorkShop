@@ -11,8 +11,8 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || 'Registration failed');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Registration failed');
     }
 
     const data = await response.json();
@@ -30,8 +30,8 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || 'Login failed');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Login failed');
     }
 
     const data = await response.json();
@@ -87,8 +87,8 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || 'Failed to send password reset email');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to send password reset email');
     }
 
     return await response.json();
@@ -104,8 +104,8 @@ class AuthService {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || 'Failed to reset password');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to reset password');
     }
 
     return await response.json();
