@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Enums;
 using WorkShop.Infrastructure.Services;
 
 namespace WorkShop.Infrastructure.Data;
@@ -80,7 +81,7 @@ public static class DbInitializer
             Username = "admin",
             Email = "admin@workshop.com",
             PasswordHash = adminPasswordHash,
-            Role = "Admin",
+            Role = UserRole.Admin,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -94,7 +95,7 @@ public static class DbInitializer
             Username = "customer",
             Email = "customer@workshop.com",
             PasswordHash = customerPasswordHash,
-            Role = "Customer",
+            Role = UserRole.Customer,
             CreatedAt = DateTime.UtcNow
         };
 

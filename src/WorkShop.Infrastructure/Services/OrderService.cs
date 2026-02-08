@@ -3,6 +3,7 @@ using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Enums;
 using WorkShop.Infrastructure.Data;
 
 namespace WorkShop.Infrastructure.Services;
@@ -28,8 +29,8 @@ public class OrderService : IOrderService
             {
                 UserId = userId,
                 OrderDate = DateTime.UtcNow,
-                Status = "Pending",
-                TrackingStatus = "Order Placed",
+                Status = OrderStatus.Pending,
+                TrackingStatus = TrackingStatus.OrderPlaced,
                 PhoneNumber = orderDto.PhoneNumber,
                 AlternativePhoneNumber = orderDto.AlternativePhoneNumber,
                 HomeAddress = orderDto.HomeAddress
@@ -68,7 +69,7 @@ public class OrderService : IOrderService
             }
 
             order.TotalAmount = totalAmount;
-            order.Status = "Completed";
+            order.Status = OrderStatus.Completed;
             order.CompletedDate = DateTime.UtcNow;
 
             _context.Orders.Add(order);
@@ -103,7 +104,7 @@ public class OrderService : IOrderService
         if (order == null)
             return null;
 
-        var canCancel = order.Status != "Cancelled" && 
+        var canCancel = order.Status != OrderStatus.Cancelled && 
                         (DateTime.UtcNow - order.OrderDate).TotalHours <= 1;
 
         return new OrderResponseModel
@@ -152,7 +153,7 @@ public class OrderService : IOrderService
             TrackingStatus = order.TrackingStatus,
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
-            CanCancel = order.Status != "Cancelled" && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
+            CanCancel = order.Status != OrderStatus.Cancelled && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
             PhoneNumber = order.PhoneNumber,
             AlternativePhoneNumber = order.AlternativePhoneNumber,
             HomeAddress = order.HomeAddress,
@@ -179,11 +180,11 @@ public class OrderService : IOrderService
             .AsQueryable();
 
         // Apply filters
-        if (!string.IsNullOrEmpty(status))
-            query = query.Where(o => o.Status == status);
+        if (!string.IsNullOrEmpty(status) && Enum.TryParse<OrderStatus>(status, true, out var orderStatus))
+            query = query.Where(o => o.Status == orderStatus);
 
-        if (!string.IsNullOrEmpty(trackingStatus))
-            query = query.Where(o => o.TrackingStatus == trackingStatus);
+        if (!string.IsNullOrEmpty(trackingStatus) && Enum.TryParse<TrackingStatus>(trackingStatus, true, out var trackStatus))
+            query = query.Where(o => o.TrackingStatus == trackStatus);
 
         if (startDate.HasValue)
             query = query.Where(o => o.OrderDate >= startDate.Value);
@@ -218,7 +219,7 @@ public class OrderService : IOrderService
             TrackingStatus = order.TrackingStatus,
             OrderDate = order.OrderDate,
             CompletedDate = order.CompletedDate,
-            CanCancel = order.Status != "Cancelled" && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
+            CanCancel = order.Status != OrderStatus.Cancelled && (DateTime.UtcNow - order.OrderDate).TotalHours <= 1,
             PhoneNumber = order.PhoneNumber,
             AlternativePhoneNumber = order.AlternativePhoneNumber,
             HomeAddress = order.HomeAddress,
@@ -242,7 +243,7 @@ public class OrderService : IOrderService
             .ThenInclude(oi => oi.Book)
             .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
 
-        if (order == null || order.Status == "Cancelled")
+        if (order == null || order.Status == OrderStatus.Cancelled)
             return false;
 
         var hoursSinceOrder = (DateTime.UtcNow - order.OrderDate).TotalHours;
@@ -261,7 +262,7 @@ public class OrderService : IOrderService
                 item.Book.SoldCount = Math.Max(0, item.Book.SoldCount - item.Quantity);
             }
 
-            order.Status = "Cancelled";
+            order.Status = OrderStatus.Cancelled;
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
@@ -287,11 +288,11 @@ public class OrderService : IOrderService
         if (order == null)
             return null;
 
-        if (!string.IsNullOrEmpty(model.TrackingStatus))
-            order.TrackingStatus = model.TrackingStatus;
+        if (model.TrackingStatus.HasValue)
+            order.TrackingStatus = model.TrackingStatus.Value;
 
-        if (!string.IsNullOrEmpty(model.Status))
-            order.Status = model.Status;
+        if (model.Status.HasValue)
+            order.Status = model.Status.Value;
 
         if (!string.IsNullOrEmpty(model.PhoneNumber))
             order.PhoneNumber = model.PhoneNumber;

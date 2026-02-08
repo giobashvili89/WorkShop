@@ -3,6 +3,7 @@ using Xunit;
 using WorkShop.Application.Interfaces;
 using WorkShop.Application.Models.Request;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Enums;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ public class OrderServiceTests
         var mockEmailService = new Mock<IEmailService>();
         var orderService = new OrderService(context, mockEmailService.Object);
 
-        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = "Customer" };
+        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
         context.Users.Add(user);
 
         var book = new Book { Title = "Test Book", Author = "Test Author", Price = 10.00m, StockQuantity = 5, SoldCount = 0 };
@@ -54,8 +55,8 @@ public class OrderServiceTests
         Assert.NotNull(result);
         Assert.Equal(user.Id, result.UserId);
         Assert.Equal(20.00m, result.TotalAmount);
-        Assert.Equal("Completed", result.Status);
-        Assert.Equal("Order Placed", result.TrackingStatus);
+        Assert.Equal(OrderStatus.Completed, result.Status);
+        Assert.Equal(TrackingStatus.OrderPlaced, result.TrackingStatus);
         Assert.Single(result.Items);
         Assert.Equal(2, result.Items[0].Quantity);
 
@@ -73,7 +74,7 @@ public class OrderServiceTests
         var mockEmailService = new Mock<IEmailService>();
         var orderService = new OrderService(context, mockEmailService.Object);
 
-        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = "Customer" };
+        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
         context.Users.Add(user);
 
         var book = new Book { Title = "Test Book", Author = "Test Author", Price = 10.00m, StockQuantity = 1, SoldCount = 0 };
@@ -110,8 +111,8 @@ public class OrderServiceTests
         var mockEmailService = new Mock<IEmailService>();
         var orderService = new OrderService(context, mockEmailService.Object);
 
-        var user1 = new User { Username = "user1", Email = "user1@test.com", PasswordHash = "passwordhash", Role = "Customer" };
-        var user2 = new User { Username = "user2", Email = "user2@test.com", PasswordHash = "passwordhash", Role = "Customer" };
+        var user1 = new User { Username = "user1", Email = "user1@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
+        var user2 = new User { Username = "user2", Email = "user2@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
         context.Users.AddRange(user1, user2);
 
         var book = new Book { Title = "Test Book", Author = "Test Author", Price = 10.00m, StockQuantity = 10 };
@@ -122,8 +123,8 @@ public class OrderServiceTests
         {
             UserId = user1.Id,
             TotalAmount = 20m,
-            Status = "Completed",
-            TrackingStatus = "Delivered",
+            Status = OrderStatus.Completed,
+            TrackingStatus = TrackingStatus.Delivered,
             PhoneNumber = "+1234567890",
             HomeAddress = "123 Test St",
             OrderItems = new List<OrderItem> { new() { BookId = book.Id, Quantity = 2, UnitPrice = 10m, TotalPrice = 20m } }
@@ -132,8 +133,8 @@ public class OrderServiceTests
         {
             UserId = user2.Id,
             TotalAmount = 30m,
-            Status = "Pending",
-            TrackingStatus = "Processing",
+            Status = OrderStatus.Pending,
+            TrackingStatus = TrackingStatus.Processing,
             PhoneNumber = "+0987654321",
             HomeAddress = "456 Test Ave",
             OrderItems = new List<OrderItem> { new() { BookId = book.Id, Quantity = 3, UnitPrice = 10m, TotalPrice = 30m } }
@@ -156,7 +157,7 @@ public class OrderServiceTests
         var mockEmailService = new Mock<IEmailService>();
         var orderService = new OrderService(context, mockEmailService.Object);
 
-        var user = new User { Username = "user1", Email = "user1@test.com", PasswordHash = "passwordhash", Role = "Customer" };
+        var user = new User { Username = "user1", Email = "user1@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
         context.Users.Add(user);
 
         var book = new Book { Title = "Test Book", Author = "Test Author", Price = 10.00m, StockQuantity = 10 };
@@ -167,8 +168,8 @@ public class OrderServiceTests
         {
             UserId = user.Id,
             TotalAmount = 20m,
-            Status = "Completed",
-            TrackingStatus = "Delivered",
+            Status = OrderStatus.Completed,
+            TrackingStatus = TrackingStatus.Delivered,
             PhoneNumber = "+1234567890",
             HomeAddress = "123 Test St",
             OrderItems = new List<OrderItem> { new() { BookId = book.Id, Quantity = 2, UnitPrice = 10m, TotalPrice = 20m } }
@@ -177,8 +178,8 @@ public class OrderServiceTests
         {
             UserId = user.Id,
             TotalAmount = 30m,
-            Status = "Pending",
-            TrackingStatus = "Processing",
+            Status = OrderStatus.Pending,
+            TrackingStatus = TrackingStatus.Processing,
             PhoneNumber = "+0987654321",
             HomeAddress = "456 Test Ave",
             OrderItems = new List<OrderItem> { new() { BookId = book.Id, Quantity = 3, UnitPrice = 10m, TotalPrice = 30m } }
@@ -191,7 +192,7 @@ public class OrderServiceTests
 
         // Assert
         Assert.Single(result);
-        Assert.Equal("Completed", result.First().Status);
+        Assert.Equal(OrderStatus.Completed, result.First().Status);
     }
 
     [Fact]
@@ -202,7 +203,7 @@ public class OrderServiceTests
         var mockEmailService = new Mock<IEmailService>();
         var orderService = new OrderService(context, mockEmailService.Object);
 
-        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = "Customer" };
+        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
         context.Users.Add(user);
 
         var book = new Book { Title = "Test Book", Author = "Test Author", Price = 10.00m, StockQuantity = 3, SoldCount = 2 };
@@ -213,7 +214,7 @@ public class OrderServiceTests
         {
             UserId = user.Id,
             TotalAmount = 20m,
-            Status = "Completed",
+            Status = OrderStatus.Completed,
             OrderDate = DateTime.UtcNow.AddMinutes(-30), // 30 minutes ago
             PhoneNumber = "+1234567890",
             HomeAddress = "123 Test St",
@@ -231,7 +232,7 @@ public class OrderServiceTests
         // Assert
         Assert.True(result);
         var cancelledOrder = await context.Orders.FindAsync(order.Id);
-        Assert.Equal("Cancelled", cancelledOrder?.Status);
+        Assert.Equal(OrderStatus.Cancelled, cancelledOrder?.Status);
 
         // Verify stock was restored
         var restoredBook = await context.Books.FindAsync(book.Id);
@@ -247,7 +248,7 @@ public class OrderServiceTests
         var mockEmailService = new Mock<IEmailService>();
         var orderService = new OrderService(context, mockEmailService.Object);
 
-        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = "Customer" };
+        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
         context.Users.Add(user);
 
         var book = new Book { Title = "Test Book", Author = "Test Author", Price = 10.00m, StockQuantity = 3 };
@@ -258,7 +259,7 @@ public class OrderServiceTests
         {
             UserId = user.Id,
             TotalAmount = 20m,
-            Status = "Completed",
+            Status = OrderStatus.Completed,
             OrderDate = DateTime.UtcNow.AddHours(-2), // 2 hours ago
             PhoneNumber = "+1234567890",
             HomeAddress = "123 Test St",
@@ -284,7 +285,7 @@ public class OrderServiceTests
         var mockEmailService = new Mock<IEmailService>();
         var orderService = new OrderService(context, mockEmailService.Object);
 
-        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = "Customer" };
+        var user = new User { Username = "testuser", Email = "test@test.com", PasswordHash = "passwordhash", Role = UserRole.Customer };
         context.Users.Add(user);
 
         var book = new Book { Title = "Test Book", Author = "Test Author", Price = 10.00m, StockQuantity = 5 };
@@ -295,8 +296,8 @@ public class OrderServiceTests
         {
             UserId = user.Id,
             TotalAmount = 20m,
-            Status = "Pending",
-            TrackingStatus = "Order Placed",
+            Status = OrderStatus.Pending,
+            TrackingStatus = TrackingStatus.OrderPlaced,
             PhoneNumber = "+1234567890",
             HomeAddress = "123 Test St",
             OrderItems = new List<OrderItem>
@@ -309,8 +310,8 @@ public class OrderServiceTests
 
         var updateModel = new UpdateDeliveryInfoRequestModel
         {
-            TrackingStatus = "In Warehouse",
-            Status = "Completed",
+            TrackingStatus = TrackingStatus.InWarehouse,
+            Status = OrderStatus.Completed,
             PhoneNumber = "+9999999999",
             SendEmail = false
         };
@@ -320,12 +321,12 @@ public class OrderServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("In Warehouse", result.TrackingStatus);
-        Assert.Equal("Completed", result.Status);
+        Assert.Equal(TrackingStatus.InWarehouse, result.TrackingStatus);
+        Assert.Equal(OrderStatus.Completed, result.Status);
         Assert.Equal("+9999999999", result.PhoneNumber);
 
         var updatedOrder = await context.Orders.FindAsync(order.Id);
-        Assert.Equal("In Warehouse", updatedOrder?.TrackingStatus);
-        Assert.Equal("Completed", updatedOrder?.Status);
+        Assert.Equal(TrackingStatus.InWarehouse, updatedOrder?.TrackingStatus);
+        Assert.Equal(OrderStatus.Completed, updatedOrder?.Status);
     }
 }

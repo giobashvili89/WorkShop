@@ -9,6 +9,7 @@ using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Enums;
 using WorkShop.Infrastructure.Data;
 
 namespace WorkShop.Infrastructure.Services;
@@ -36,7 +37,7 @@ public class AuthService : IAuthService
             Username = registerDto.Username,
             Email = registerDto.Email,
             PasswordHash = passwordHash,
-            Role = "Customer", 
+            Role = UserRole.Customer, 
             CreatedAt = DateTime.UtcNow
         };
 
@@ -85,7 +86,7 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 
         var token = new JwtSecurityToken(

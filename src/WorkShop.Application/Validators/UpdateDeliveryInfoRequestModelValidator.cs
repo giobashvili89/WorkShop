@@ -1,5 +1,6 @@
 using FluentValidation;
 using WorkShop.Application.Models.Request;
+using WorkShop.Domain.Enums;
 
 namespace WorkShop.Application.Validators;
 
@@ -28,19 +29,7 @@ public class UpdateDeliveryInfoRequestModelValidator : AbstractValidator<UpdateD
                 .WithMessage("Address must be at least 10 characters long.");
         });
 
-        When(x => !string.IsNullOrEmpty(x.Status), () =>
-        {
-            RuleFor(x => x.Status)
-                .Must(s => s == "Pending" || s == "Completed" || s == "Cancelled")
-                .WithMessage("Status must be one of: Pending, Completed, Cancelled");
-        });
-
-        When(x => !string.IsNullOrEmpty(x.TrackingStatus), () =>
-        {
-            RuleFor(x => x.TrackingStatus)
-                .Must(ts => ts == "Order Placed" || ts == "Processing" || ts == "In Warehouse" || 
-                           ts == "On The Way" || ts == "Out for Delivery" || ts == "Delivered")
-                .WithMessage("Tracking status must be one of: Order Placed, Processing, In Warehouse, On The Way, Out for Delivery, Delivered");
-        });
+        // Enum validation is now handled by the type system
+        // Status and TrackingStatus are already validated by being nullable enums
     }
 }
