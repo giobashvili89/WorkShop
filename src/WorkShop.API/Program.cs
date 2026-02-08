@@ -1,15 +1,8 @@
-using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
-using System.Text;
-using WorkShop.Application.Interfaces;
-using WorkShop.Application.Validators;
+using WorkShop.API.Configuration;
+using WorkShop.Application;
+using WorkShop.Infrastructure;
 using WorkShop.Infrastructure.Data;
-using WorkShop.Infrastructure.Services;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,89 +13,23 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
-// Add FluentValidation
+// Add FluentValidation Auto-Validation
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<BookRequestModelValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestModelValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<OrderRequestModelValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestModelValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<UpdateDeliveryInfoRequestModelValidator>();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    // Define the Bearer security scheme
-    options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Description = "JWT Authorization header using the Bearer scheme. Enter your token in the text input below."
-    });
+// Add Application Services (FluentValidation Validators and MediatR)
+builder.Services.AddApplicationServices();
 
-    // Add the Bearer security requirement to all operations
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-        [new OpenApiSecuritySchemeReference("bearer", document)] = new List<string>()
-    });
-    
-    // Use string enums in Swagger
-    options.UseInlineDefinitionsForEnums();
-});
+// Add Swagger Configuration
+builder.Services.AddSwaggerConfiguration();
 
-// Configure CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowReactApp",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
-});
+// Add CORS Configuration
+builder.Services.AddCorsConfiguration();
 
-// Configure PostgreSQL Database
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString)
-           .ConfigureWarnings(warnings => 
-               warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+// Add Infrastructure Services (Database and Services)
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// Configure JWT Authentication
-var jwtSecret = builder.Configuration["Jwt:Secret"] ?? "YourSuperSecretKeyForJWTTokenGeneration12345";
-var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "WorkShopAPI";
-var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "WorkShopClient";
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtIssuer,
-        ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
-    };
-});
-
-// Register MediatR
-builder.Services.AddMediatR(cfg => {
-    cfg.RegisterServicesFromAssembly(typeof(WorkShop.Application.Commands.Books.CreateBookCommand).Assembly);
-});
-
-// Register services for dependency injection
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+// Add JWT Authentication
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
