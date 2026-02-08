@@ -1,8 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace WorkShop.Domain.Exceptions;
 
 /// <summary>
 /// Exception thrown when a user is not found
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class UserNotFoundException : NotFoundException
 {
     public UserNotFoundException(int userId) 

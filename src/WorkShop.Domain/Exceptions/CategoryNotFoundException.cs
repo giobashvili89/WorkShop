@@ -1,8 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace WorkShop.Domain.Exceptions;
 
 /// <summary>
 /// Exception thrown when a category is not found
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CategoryNotFoundException : NotFoundException
 {
     public CategoryNotFoundException(int categoryId) 
