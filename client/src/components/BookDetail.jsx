@@ -69,7 +69,9 @@ function BookDetail({ book, onClose }) {
 
             <div>
               <h3 className="text-sm font-semibold text-gray-500 uppercase mb-1">Price</h3>
-              <p className="text-3xl font-bold text-green-600">${book.price.toFixed(2)}</p>
+              <p className="text-3xl font-bold text-green-600">
+                ${typeof book.price === 'number' ? book.price.toFixed(2) : '0.00'}
+              </p>
             </div>
 
             <div>
