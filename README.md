@@ -38,8 +38,6 @@ WorkShop/
 
 ## Getting Started
 
-> **Experiencing database issues?** Refer to the [DATABASE_TROUBLESHOOTING.md](DATABASE_TROUBLESHOOTING.md) guide for solutions to common database errors, including "relation 'Categories' does not exist" and migration-related issues.
-
 ### Option 1: Running with Docker (Recommended)
 
 The easiest way to run the complete application stack is using Docker Compose:
@@ -350,7 +348,6 @@ Example workflow for API authentication:
 For more detailed information about specific aspects of the project, please refer to the following documentation:
 
 - **[Development Workflow](DEVELOPMENT_WORKFLOW.md)** - Development process and best practices for contributing to the project
-- **[Database Troubleshooting](DATABASE_TROUBLESHOOTING.md)** - Solutions to common database issues and migration problems
 - **[Error Handling Implementation](ERROR_HANDLING_IMPLEMENTATION.md)** - Error handling architecture and implementation details
 - **[Routing Implementation](ROUTING_IMPLEMENTATION.md)** - Routing configuration and implementation guide
 - **[Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Overview of key implementation decisions and architectural choices
