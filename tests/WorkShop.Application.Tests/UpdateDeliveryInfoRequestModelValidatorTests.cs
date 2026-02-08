@@ -1,6 +1,7 @@
 using FluentValidation.TestHelper;
 using WorkShop.Application.Models.Request;
 using WorkShop.Application.Validators;
+using WorkShop.Domain.Enums;
 
 namespace WorkShop.Application.Tests;
 
@@ -139,26 +140,9 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     }
 
     [Fact]
-    public void Should_Not_Have_Error_When_Status_Is_Empty()
-    {
-        var model = new UpdateDeliveryInfoRequestModel { Status = "" };
-        var result = _validator.TestValidate(model);
-        result.ShouldNotHaveValidationErrorFor(x => x.Status);
-    }
-
-    [Fact]
-    public void Should_Have_Error_When_Status_Is_Invalid()
-    {
-        var model = new UpdateDeliveryInfoRequestModel { Status = "InvalidStatus" };
-        var result = _validator.TestValidate(model);
-        result.ShouldHaveValidationErrorFor(x => x.Status)
-            .WithErrorMessage("Status must be one of: Pending, Completed, Cancelled");
-    }
-
-    [Fact]
     public void Should_Not_Have_Error_When_Status_Is_Pending()
     {
-        var model = new UpdateDeliveryInfoRequestModel { Status = "Pending" };
+        var model = new UpdateDeliveryInfoRequestModel { Status = OrderStatus.Pending };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.Status);
     }
@@ -166,7 +150,7 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_Status_Is_Completed()
     {
-        var model = new UpdateDeliveryInfoRequestModel { Status = "Completed" };
+        var model = new UpdateDeliveryInfoRequestModel { Status = OrderStatus.Completed };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.Status);
     }
@@ -174,7 +158,7 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_Status_Is_Cancelled()
     {
-        var model = new UpdateDeliveryInfoRequestModel { Status = "Cancelled" };
+        var model = new UpdateDeliveryInfoRequestModel { Status = OrderStatus.Cancelled };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.Status);
     }
@@ -188,26 +172,9 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     }
 
     [Fact]
-    public void Should_Not_Have_Error_When_TrackingStatus_Is_Empty()
-    {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "" };
-        var result = _validator.TestValidate(model);
-        result.ShouldNotHaveValidationErrorFor(x => x.TrackingStatus);
-    }
-
-    [Fact]
-    public void Should_Have_Error_When_TrackingStatus_Is_Invalid()
-    {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "InvalidTracking" };
-        var result = _validator.TestValidate(model);
-        result.ShouldHaveValidationErrorFor(x => x.TrackingStatus)
-            .WithErrorMessage("Tracking status must be one of: Order Placed, Processing, In Warehouse, On The Way, Out for Delivery, Delivered");
-    }
-
-    [Fact]
     public void Should_Not_Have_Error_When_TrackingStatus_Is_OrderPlaced()
     {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "Order Placed" };
+        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = TrackingStatus.OrderPlaced };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.TrackingStatus);
     }
@@ -215,7 +182,7 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_TrackingStatus_Is_Processing()
     {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "Processing" };
+        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = TrackingStatus.Processing };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.TrackingStatus);
     }
@@ -223,7 +190,7 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_TrackingStatus_Is_InWarehouse()
     {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "In Warehouse" };
+        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = TrackingStatus.InWarehouse };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.TrackingStatus);
     }
@@ -231,7 +198,7 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_TrackingStatus_Is_OnTheWay()
     {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "On The Way" };
+        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = TrackingStatus.OnTheWay };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.TrackingStatus);
     }
@@ -239,7 +206,7 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_TrackingStatus_Is_OutForDelivery()
     {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "Out for Delivery" };
+        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = TrackingStatus.OutForDelivery };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.TrackingStatus);
     }
@@ -247,7 +214,7 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_TrackingStatus_Is_Delivered()
     {
-        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = "Delivered" };
+        var model = new UpdateDeliveryInfoRequestModel { TrackingStatus = TrackingStatus.Delivered };
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.TrackingStatus);
     }
@@ -277,8 +244,8 @@ public class UpdateDeliveryInfoRequestModelValidatorTests
             PhoneNumber = "+1 (555) 123-4567",
             AlternativePhoneNumber = "+1 (555) 987-6543",
             HomeAddress = "123 Main Street, Apt 4B, New York, NY 10001",
-            Status = "Completed",
-            TrackingStatus = "Delivered",
+            Status = OrderStatus.Completed,
+            TrackingStatus = TrackingStatus.Delivered,
             SendEmail = true
         };
 

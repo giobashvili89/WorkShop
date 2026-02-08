@@ -1,3 +1,5 @@
+using WorkShop.Domain.Enums;
+
 namespace WorkShop.Domain.Entities;
 
 public class Order
@@ -6,8 +8,8 @@ public class Order
     public int UserId { get; set; }
     public User User { get; set; } = null!;
     public decimal TotalAmount { get; set; }
-    public string Status { get; set; } = "Pending"; // Pending, Completed, Cancelled
-    public string TrackingStatus { get; set; } = "Order Placed"; // Order Placed, Processing, In Warehouse, On The Way, Out for Delivery, Delivered
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
+    public TrackingStatus TrackingStatus { get; set; } = TrackingStatus.OrderPlaced;
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
     public DateTime? CompletedDate { get; set; }
     public bool EmailSent { get; set; } = false;

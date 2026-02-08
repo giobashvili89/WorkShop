@@ -13,7 +13,11 @@ using WorkShop.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 // Add FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
@@ -40,6 +44,9 @@ builder.Services.AddSwaggerGen(options =>
     {
         [new OpenApiSecuritySchemeReference("bearer", document)] = new List<string>()
     });
+    
+    // Use string enums in Swagger
+    options.UseInlineDefinitionsForEnums();
 });
 
 // Configure CORS

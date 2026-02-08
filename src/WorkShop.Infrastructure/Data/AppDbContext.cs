@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Enums;
 
 namespace WorkShop.Infrastructure.Data;
 
@@ -23,7 +24,7 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Username).IsUnique();
             entity.HasIndex(e => e.Email).IsUnique();
-            entity.Property(e => e.Role).HasDefaultValue("Customer");
+            entity.Property(e => e.Role).HasDefaultValue(UserRole.Customer);
         });
 
         modelBuilder.Entity<Book>(entity =>
@@ -43,7 +44,8 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18,2)");
-            entity.Property(e => e.Status).HasDefaultValue("Pending");
+            entity.Property(e => e.Status).HasDefaultValue(OrderStatus.Pending);
+            entity.Property(e => e.TrackingStatus).HasDefaultValue(TrackingStatus.OrderPlaced);
         });
 
         modelBuilder.Entity<OrderItem>(entity =>
