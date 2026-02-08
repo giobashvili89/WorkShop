@@ -44,10 +44,10 @@ function LoginPage() {
 }
 
 // Main layout wrapper
-function Layout({ children, onLogout, showHeader = true }) {
+function Layout({ children, onLogout }) {
   return (
     <div className="min-h-screen bg-gray-100">
-      {showHeader && <Header onLogout={onLogout} />}
+      <Header onLogout={onLogout} />
       <main>{children}</main>
     </div>
   );

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { bookService } from '../services/bookService';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
 
 function BookList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -110,7 +111,7 @@ function BookList() {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
       // Redirect to login page with state to return here after login
-      navigate('/login', { state: { from: window.location.pathname } });
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
 
