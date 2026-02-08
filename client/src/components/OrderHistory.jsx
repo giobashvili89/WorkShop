@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
 
@@ -8,24 +8,35 @@ function OrderHistory() {
   const [error, setError] = useState(null);
   const isAdmin = authService.isAdmin();
 
-  const loadOrders = useCallback(async () => {
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        setLoading(true);
+        const data = isAdmin 
+          ? await orderService.getAllOrders()
+          : await orderService.getMyOrders();
+        setOrders(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadOrders();
+  }, [isAdmin]);
+
+  const reloadOrders = async () => {
     try {
-      setLoading(true);
       const data = isAdmin 
         ? await orderService.getAllOrders()
         : await orderService.getMyOrders();
       setOrders(data);
-      setError(null);
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
-  }, [isAdmin]);
-
-  useEffect(() => {
-    loadOrders();
-  }, [loadOrders]);
+  };
 
   const handleCancelOrder = async (orderId) => {
     if (!confirm('Are you sure you want to cancel this order?')) return;
@@ -33,7 +44,7 @@ function OrderHistory() {
     try {
       await orderService.cancelOrder(orderId);
       alert('Order cancelled successfully! A confirmation email has been sent.');
-      loadOrders();
+      await reloadOrders();
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message;
       alert('Failed to cancel order: ' + errorMessage);
