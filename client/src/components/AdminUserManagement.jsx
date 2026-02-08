@@ -235,8 +235,9 @@ function AdminUserManagement() {
                       ) : (
                         <button
                           onClick={() => handleBlockUser(user.id)}
-                          className="text-red-600 hover:text-red-900 mr-3"
+                          className="text-red-600 hover:text-red-900 mr-3 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={user.role === 'Admin'}
+                          title={user.role === 'Admin' ? 'Admin users cannot be blocked' : 'Block this user'}
                         >
                           Block
                         </button>
