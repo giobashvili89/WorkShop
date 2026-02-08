@@ -52,6 +52,12 @@ CodeCoverage/
 *.runtimeconfig.json
 *.runtimeconfig.dev.json
 
+# BuildHost files (EF Core tools, Roslyn, etc.)
+**/BuildHost*/
+**/BuildHost*/*.config
+**/BuildHost*/*.dll
+**/BuildHost*/*.exe
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
