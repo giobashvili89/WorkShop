@@ -44,10 +44,10 @@ function LoginPage() {
 }
 
 // Main layout wrapper
-function Layout({ children, onLogout }) {
+function Layout({ children, onLogout, showHeader = true }) {
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header onLogout={onLogout} />
+      {showHeader && <Header onLogout={onLogout} />}
       <main>{children}</main>
     </div>
   );
@@ -64,26 +64,22 @@ function App() {
         {/* Login route */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Protected routes with layout */}
+        {/* Public routes with layout */}
         <Route
           path="/"
           element={
-            <ProtectedRoute>
-              <Layout onLogout={handleLogout}>
-                <BookList />
-              </Layout>
-            </ProtectedRoute>
+            <Layout onLogout={handleLogout}>
+              <BookList />
+            </Layout>
           }
         />
 
         <Route
           path="/books"
           element={
-            <ProtectedRoute>
-              <Layout onLogout={handleLogout}>
-                <BookList />
-              </Layout>
-            </ProtectedRoute>
+            <Layout onLogout={handleLogout}>
+              <BookList />
+            </Layout>
           }
         />
 

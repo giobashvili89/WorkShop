@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { bookService } from '../services/bookService';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
 
 function BookList() {
+  const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,6 +22,23 @@ function BookList() {
     homeAddress: ''
   });
   const [deliveryErrors, setDeliveryErrors] = useState({});
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (err) {
+        console.error('Failed to load cart from localStorage:', err);
+      }
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   useEffect(() => {
     loadBooks();
@@ -69,6 +88,15 @@ function BookList() {
   }, [visibleCount, filteredBooks.length]);
 
   const addToCart = (book) => {
+    // Check if user is authenticated
+    if (!authService.isAuthenticated()) {
+      // Save current location for redirect after login
+      localStorage.setItem('redirectAfterLogin', window.location.pathname);
+      // Redirect to login page
+      navigate('/login');
+      return;
+    }
+
     const existingItem = cart.find(item => item.bookId === book.id);
     const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
     
@@ -160,6 +188,7 @@ function BookList() {
       await orderService.createOrder(orderItems, deliveryInfo);
       alert('Order placed successfully!');
       setCart([]);
+      localStorage.removeItem('cart'); // Clear cart from localStorage
       setShowCart(false);
       setShowDeliveryForm(false);
       setDeliveryInfo({
@@ -207,12 +236,13 @@ function BookList() {
   }
 
   const isAdmin = authService.isAdmin();
+  const isAuthenticated = authService.isAuthenticated();
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800">Book Store</h1>
-        {!isAdmin && (
+        {!isAdmin && isAuthenticated && (
           <button
             onClick={() => setShowCart(!showCart)}
             className="relative bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
@@ -245,7 +275,7 @@ function BookList() {
       </div>
 
       {/* Shopping Cart Modal */}
-      {showCart && !isAdmin && (
+      {showCart && !isAdmin && isAuthenticated && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">

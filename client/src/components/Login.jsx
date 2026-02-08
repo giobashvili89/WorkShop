@@ -22,7 +22,15 @@ function Login() {
       } else {
         await authService.register(username, email, password);
       }
-      navigate('/', { replace: true });
+      
+      // Check if there's a redirect URL stored
+      const redirectUrl = localStorage.getItem('redirectAfterLogin');
+      if (redirectUrl) {
+        localStorage.removeItem('redirectAfterLogin');
+        navigate(redirectUrl, { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (err) {
       setError(err.message);
     } finally {

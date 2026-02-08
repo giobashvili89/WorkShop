@@ -4,6 +4,7 @@ import { authService } from '../services/authService';
 function Header({ onLogout }) {
   const username = authService.getUsername();
   const isAdmin = authService.isAdmin();
+  const isAuthenticated = authService.isAuthenticated();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -26,34 +27,49 @@ function Header({ onLogout }) {
               <NavLink to="/books" className={navLinkClass}>
                 Browse Books
               </NavLink>
-              {isAdmin && (
+              {isAuthenticated && (
                 <>
-                  <NavLink to="/admin/books" className={navLinkClass}>
-                    Manage Books
-                  </NavLink>
-                  <NavLink to="/admin/orders" className={navLinkClass}>
-                    Manage Orders
-                  </NavLink>
+                  {isAdmin && (
+                    <>
+                      <NavLink to="/admin/books" className={navLinkClass}>
+                        Manage Books
+                      </NavLink>
+                      <NavLink to="/admin/orders" className={navLinkClass}>
+                        Manage Orders
+                      </NavLink>
+                    </>
+                  )}
+                  {!isAdmin && (
+                    <NavLink to="/orders" className={navLinkClass}>
+                      My Orders
+                    </NavLink>
+                  )}
                 </>
-              )}
-              {!isAdmin && (
-                <NavLink to="/orders" className={navLinkClass}>
-                  My Orders
-                </NavLink>
               )}
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm">
-              Welcome, <span className="font-semibold">{username}</span>
-              {isAdmin && <span className="ml-2 px-2 py-1 bg-yellow-500 text-xs rounded">Admin</span>}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
-            >
-              Logout
-            </button>
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm">
+                  Welcome, <span className="font-semibold">{username}</span>
+                  {isAdmin && <span className="ml-2 px-2 py-1 bg-yellow-500 text-xs rounded">Admin</span>}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
       </div>
