@@ -13,16 +13,30 @@ function DeliveryInfoModal({ order, onClose, onUpdate }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Enum values must match backend exactly (PascalCase, no spaces)
   const trackingStatuses = [
-    'Order Placed',
+    'OrderPlaced',
     'Processing',
-    'In Warehouse',
-    'On The Way',
-    'Out for Delivery',
+    'InWarehouse',
+    'OnTheWay',
+    'OutForDelivery',
     'Delivered'
   ];
 
   const orderStatuses = ['Pending', 'Completed', 'Cancelled'];
+
+  // Helper function to convert enum values to human-readable labels
+  const getTrackingStatusLabel = (status) => {
+    const labels = {
+      'OrderPlaced': 'Order Placed',
+      'Processing': 'Processing',
+      'InWarehouse': 'In Warehouse',
+      'OnTheWay': 'On The Way',
+      'OutForDelivery': 'Out for Delivery',
+      'Delivered': 'Delivered'
+    };
+    return labels[status] || status;
+  };
 
   const phoneRegex = /^\+?[0-9\s\-()]{7,20}$/;
 
@@ -129,7 +143,7 @@ function DeliveryInfoModal({ order, onClose, onUpdate }) {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {trackingStatuses.map(status => (
-                <option key={status} value={status}>{status}</option>
+                <option key={status} value={status}>{getTrackingStatusLabel(status)}</option>
               ))}
             </select>
           </div>

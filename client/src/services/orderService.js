@@ -20,8 +20,37 @@ class OrderService {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || 'Failed to create order');
+      let errorMessage = 'Failed to create order';
+      try {
+        const errorData = await response.json();
+        // Handle ASP.NET Core validation error format
+        if (errorData.errors) {
+          const messages = [];
+          for (const [field, fieldErrors] of Object.entries(errorData.errors)) {
+            if (Array.isArray(fieldErrors)) {
+              messages.push(...fieldErrors);
+            }
+          }
+          errorMessage = messages.join('. ') || errorMessage;
+        }
+        // Handle custom middleware error format
+        else if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+        // Handle title from problem details
+        else if (errorData.title) {
+          errorMessage = errorData.title;
+        }
+      } catch (e) {
+        // If JSON parsing fails, try to get text
+        try {
+          const text = await response.text();
+          if (text) errorMessage = text;
+        } catch (textError) {
+          // Use default error message
+        }
+      }
+      throw new Error(errorMessage);
     }
     return response.json();
   }
@@ -80,8 +109,37 @@ class OrderService {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || 'Failed to update delivery information');
+      let errorMessage = 'Failed to update delivery information';
+      try {
+        const errorData = await response.json();
+        // Handle ASP.NET Core validation error format
+        if (errorData.errors) {
+          const messages = [];
+          for (const [field, fieldErrors] of Object.entries(errorData.errors)) {
+            if (Array.isArray(fieldErrors)) {
+              messages.push(...fieldErrors);
+            }
+          }
+          errorMessage = messages.join('. ') || errorMessage;
+        }
+        // Handle custom middleware error format
+        else if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+        // Handle title from problem details
+        else if (errorData.title) {
+          errorMessage = errorData.title;
+        }
+      } catch (e) {
+        // If JSON parsing fails, try to get text
+        try {
+          const text = await response.text();
+          if (text) errorMessage = text;
+        } catch (textError) {
+          // Use default error message
+        }
+      }
+      throw new Error(errorMessage);
     }
     return response.json();
   }

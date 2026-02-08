@@ -493,6 +493,17 @@ function AdminBookManagement() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                onClick={() => handleSort('id')}
+              >
+                <div className="flex items-center">
+                  ID
+                  {sortField === 'id' && (
+                    <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  )}
+                </div>
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Title
               </th>
@@ -551,6 +562,9 @@ function AdminBookManagement() {
           <tbody className="bg-white divide-y divide-gray-200">
             {currentBooks.map(book => (
               <tr key={book.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-500">#{book.id}</div>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{book.title}</div>
                 </td>
