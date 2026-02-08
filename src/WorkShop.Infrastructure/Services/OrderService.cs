@@ -170,12 +170,43 @@ public class OrderService : IOrderService
         });
     }
 
-    public async Task<IEnumerable<OrderResponseModel>> GetAllOrdersAsync()
+    public async Task<IEnumerable<OrderResponseModel>> GetAllOrdersAsync(string? status = null, 
+        string? trackingStatus = null, DateTime? startDate = null, DateTime? endDate = null, 
+        string? customerSearch = null, int? orderId = null, decimal? minAmount = null, decimal? maxAmount = null)
     {
-        var orders = await _context.Orders
+        var query = _context.Orders
             .Include(o => o.User)
             .Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Book)
+            .AsQueryable();
+
+        // Apply filters
+        if (!string.IsNullOrEmpty(status))
+            query = query.Where(o => o.Status == status);
+
+        if (!string.IsNullOrEmpty(trackingStatus))
+            query = query.Where(o => o.TrackingStatus == trackingStatus);
+
+        if (startDate.HasValue)
+            query = query.Where(o => o.OrderDate >= startDate.Value);
+
+        if (endDate.HasValue)
+            query = query.Where(o => o.OrderDate <= endDate.Value);
+
+        if (!string.IsNullOrEmpty(customerSearch))
+            query = query.Where(o => o.User.Username.Contains(customerSearch) || 
+                                    o.UserId.ToString() == customerSearch);
+
+        if (orderId.HasValue)
+            query = query.Where(o => o.Id == orderId.Value);
+
+        if (minAmount.HasValue)
+            query = query.Where(o => o.TotalAmount >= minAmount.Value);
+
+        if (maxAmount.HasValue)
+            query = query.Where(o => o.TotalAmount <= maxAmount.Value);
+
+        var orders = await query
             .OrderByDescending(o => o.OrderDate)
             .ToListAsync();
 
@@ -248,6 +279,46 @@ public class OrderService : IOrderService
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+    public async Task<OrderResponseModel?> UpdateDeliveryInfoAsync(int orderId, UpdateDeliveryInfoRequestModel model)
+    {
+        var order = await _context.Orders
+            .Include(o => o.User)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Book)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+
+        if (order == null)
+            return null;
+
+        // Update fields only if provided
+        if (!string.IsNullOrEmpty(model.TrackingStatus))
+            order.TrackingStatus = model.TrackingStatus;
+
+        if (!string.IsNullOrEmpty(model.Status))
+            order.Status = model.Status;
+
+        if (!string.IsNullOrEmpty(model.PhoneNumber))
+            order.PhoneNumber = model.PhoneNumber;
+
+        if (!string.IsNullOrEmpty(model.AlternativePhoneNumber))
+            order.AlternativePhoneNumber = model.AlternativePhoneNumber;
+
+        if (!string.IsNullOrEmpty(model.HomeAddress))
+            order.HomeAddress = model.HomeAddress;
+
+        await _context.SaveChangesAsync();
+
+        // Send email notification if requested
+        if (model.SendEmail)
+        {
+            await _emailService.SendOrderStatusUpdateEmailAsync(order, order.User);
+            order.EmailSent = true;
+            await _context.SaveChangesAsync();
+        }
+
+        return await GetOrderByIdAsync(orderId);
     }
 }
 

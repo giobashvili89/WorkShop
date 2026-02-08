@@ -66,9 +66,18 @@ public class OrdersController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<IEnumerable<OrderResponseModel>>> GetAllOrders()
+    public async Task<ActionResult<IEnumerable<OrderResponseModel>>> GetAllOrders(
+        [FromQuery] string? status = null,
+        [FromQuery] string? trackingStatus = null,
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null,
+        [FromQuery] string? customerSearch = null,
+        [FromQuery] int? orderId = null,
+        [FromQuery] decimal? minAmount = null,
+        [FromQuery] decimal? maxAmount = null)
     {
-        var orders = await _orderService.GetAllOrdersAsync();
+        var orders = await _orderService.GetAllOrdersAsync(status, trackingStatus, startDate, endDate, 
+            customerSearch, orderId, minAmount, maxAmount);
         return Ok(orders);
     }
 
@@ -94,5 +103,17 @@ public class OrdersController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    [HttpPut("{id}/delivery")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<OrderResponseModel>> UpdateDeliveryInfo(int id, [FromBody] UpdateDeliveryInfoRequestModel model)
+    {
+        var order = await _orderService.UpdateDeliveryInfoAsync(id, model);
+        
+        if (order == null)
+            return NotFound();
+        
+        return Ok(order);
     }
 }
