@@ -30,6 +30,8 @@ WorkShop/
 
 ## Getting Started
 
+> **Having database issues?** Check the [DATABASE_TROUBLESHOOTING.md](DATABASE_TROUBLESHOOTING.md) guide for solutions to common database errors including "relation 'Categories' does not exist" and migration issues.
+
 ### Option 1: Running with Docker (Recommended)
 
 The easiest way to run the entire application stack is using Docker Compose:
