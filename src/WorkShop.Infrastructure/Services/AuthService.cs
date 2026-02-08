@@ -100,4 +100,39 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public async Task<string> ForgotPasswordAsync(ForgotPasswordRequestModel request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null)
+            throw new UserNotFoundException($"User with email '{request.Email}' was not found.");
+
+        // Generate a secure reset token
+        var resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        user.PasswordResetToken = resetToken;
+        user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1); // Token valid for 1 hour
+
+        await _context.SaveChangesAsync();
+
+        // In a real application, you would send an email with the reset link here
+        // For now, we'll return the token (in production, this should be sent via email)
+        return resetToken;
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordRequestModel request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+        if (user == null)
+            throw new BadRequestException("Invalid reset token.");
+
+        if (user.PasswordResetTokenExpiry == null || user.PasswordResetTokenExpiry < DateTime.UtcNow)
+            throw new BadRequestException("Reset token has expired.");
+
+        // Update password
+        user.PasswordHash = PasswordHasher.HashPassword(request.NewPassword);
+        user.PasswordResetToken = null;
+        user.PasswordResetTokenExpiry = null;
+
+        await _context.SaveChangesAsync();
+    }
 }

@@ -30,4 +30,19 @@ public class AuthController : ControllerBase
         var result = await _mediator.Send(new LoginCommand(loginDto));
         return Ok(result);
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<string>> ForgotPassword([FromBody] ForgotPasswordRequestModel request)
+    {
+        var resetToken = await _mediator.Send(new ForgotPasswordCommand(request));
+        // In production, this would send an email instead of returning the token
+        return Ok(new { message = "Password reset email sent successfully", token = resetToken });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequestModel request)
+    {
+        await _mediator.Send(new ResetPasswordCommand(request));
+        return Ok(new { message = "Password reset successfully" });
+    }
 }
