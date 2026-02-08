@@ -62,6 +62,9 @@ public class AuthService : IAuthService
         if (user == null)
             throw new UserNotFoundException(loginDto.Username);
 
+        if (user.IsBlocked)
+            throw new UnauthorizedException("Your account has been blocked. Please contact support.");
+
         if (!PasswordHasher.VerifyPassword(loginDto.Password, user.PasswordHash))
             throw new UnauthorizedException("Invalid username or password.");
 

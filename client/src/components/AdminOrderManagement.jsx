@@ -28,6 +28,7 @@ function AdminOrderManagement() {
   const [sortOrder, setSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemSortBy, setItemSortBy] = useState(''); // Sort items within each order
 
   const isAdmin = authService.isAdmin();
 
@@ -94,6 +95,11 @@ function AdminOrderManagement() {
           aVal = a.status;
           bVal = b.status;
           break;
+        case 'bookId':
+          // Sort by the first item's bookId (or could be min/max bookId in the order)
+          aVal = a.items.length > 0 ? a.items[0].bookId : 0;
+          bVal = b.items.length > 0 ? b.items[0].bookId : 0;
+          break;
         default:
           return 0;
       }
@@ -152,6 +158,20 @@ function AdminOrderManagement() {
     setShowDeliveryModal(false);
     setSelectedOrder(null);
     loadOrders();
+  };
+
+  // Function to sort items within an order
+  const getSortedItems = (items) => {
+    if (!itemSortBy) return items;
+    
+    const sorted = [...items];
+    sorted.sort((a, b) => {
+      if (itemSortBy === 'bookId') {
+        return a.bookId - b.bookId;
+      }
+      return 0;
+    });
+    return sorted;
   };
 
   // Pagination
@@ -315,7 +335,7 @@ function AdminOrderManagement() {
       {/* Sorting and Pagination Controls */}
       <div className="bg-white rounded-lg shadow-lg p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700">Sort by:</label>
+          <label className="text-sm font-medium text-gray-700">Sort orders by:</label>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
@@ -325,6 +345,7 @@ function AdminOrderManagement() {
             <option value="amount">Total Amount</option>
             <option value="customer">Customer Name</option>
             <option value="status">Status</option>
+            <option value="bookId">Book ID</option>
           </select>
           <select
             value={sortOrder}
@@ -333,6 +354,18 @@ function AdminOrderManagement() {
           >
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>
+          </select>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-gray-700">Sort items by:</label>
+          <select
+            value={itemSortBy}
+            onChange={(e) => setItemSortBy(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Default Order</option>
+            <option value="bookId">Book ID</option>
           </select>
         </div>
 
@@ -404,12 +437,12 @@ function AdminOrderManagement() {
               <div className="border-t pt-4">
                 <h3 className="font-semibold mb-2">Items:</h3>
                 <div className="space-y-2">
-                  {order.items.map(item => (
+                  {getSortedItems(order.items).map(item => (
                     <div key={item.id} className="flex justify-between items-center bg-gray-50 p-3 rounded">
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium">{item.bookTitle}</p>
                         <p className="text-sm text-gray-600">
-                          Quantity: {item.quantity} × ${item.unitPrice.toFixed(2)}
+                          Book ID: {item.bookId} | Quantity: {item.quantity} × ${item.unitPrice.toFixed(2)}
                         </p>
                       </div>
                       <p className="font-semibold">${item.totalPrice.toFixed(2)}</p>

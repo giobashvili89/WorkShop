@@ -39,6 +39,9 @@ function Header({ onLogout }) {
                       <NavLink to="/admin/orders" className={navLinkClass}>
                         Manage Orders
                       </NavLink>
+                      <NavLink to="/admin/users" className={navLinkClass}>
+                        Manage Users
+                      </NavLink>
                     </>
                   )}
                   {!isAdmin && (
