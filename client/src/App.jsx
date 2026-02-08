@@ -26,7 +26,7 @@ function ProtectedRoute({ children, adminOnly = false }) {
 }
 
 // Login page wrapper
-function LoginPage({ onLoginSuccess }) {
+function LoginPage() {
   const navigate = useNavigate();
   const isAuthenticated = authService.isAuthenticated();
 
@@ -40,7 +40,7 @@ function LoginPage({ onLoginSuccess }) {
     return null;
   }
 
-  return <Login onLoginSuccess={onLoginSuccess} />;
+  return <Login />;
 }
 
 // Main layout wrapper
@@ -54,11 +54,6 @@ function Layout({ children, onLogout }) {
 }
 
 function App() {
-  const handleLoginSuccess = () => {
-    // Trigger re-render by calling setKey
-    window.location.reload();
-  };
-
   const handleLogout = () => {
     authService.logout();
   };
@@ -67,10 +62,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Login route */}
-        <Route 
-          path="/login" 
-          element={<LoginPage onLoginSuccess={handleLoginSuccess} />} 
-        />
+        <Route path="/login" element={<LoginPage />} />
 
         {/* Protected routes with layout */}
         <Route
