@@ -37,25 +37,38 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
+    ILogger<Program>? logger = null;
     
     try
     {
+        logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogInformation("Starting database initialization...");
+        
         var context = services.GetRequiredService<AppDbContext>();
         await DbInitializer.InitializeAsync(context);
+        
         logger.LogInformation("Database initialization completed successfully.");
     }
     catch (Exception ex)
     {
-        logger.LogCritical(ex, 
-            "CRITICAL: Database initialization failed! " +
-            "The application may not function correctly. " +
-            "Common causes: " +
-            "1. PostgreSQL is not running " +
-            "2. Connection string is incorrect " +
-            "3. Database permissions are insufficient " +
-            "See DATABASE_TROUBLESHOOTING.md for detailed troubleshooting steps.");
+        // Attempt to log error, but handle case where logger might not be available
+        if (logger != null)
+        {
+            logger.LogCritical(ex, 
+                "CRITICAL: Database initialization failed! " +
+                "The application may not function correctly. " +
+                "Common causes: " +
+                "1. PostgreSQL is not running " +
+                "2. Connection string is incorrect " +
+                "3. Database permissions are insufficient " +
+                "See DATABASE_TROUBLESHOOTING.md for detailed troubleshooting steps.");
+        }
+        else
+        {
+            // Fallback to Console if logger is not available
+            Console.WriteLine($"CRITICAL: Database initialization failed: {ex.Message}");
+            Console.WriteLine("See DATABASE_TROUBLESHOOTING.md for detailed troubleshooting steps.");
+        }
     }
 }
 
