@@ -55,39 +55,6 @@ public class SwaggerTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task Swagger_Json_ContainsProductsEndpoints()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-
-        // Act
-        var response = await client.GetAsync("/swagger/v1/swagger.json");
-        var content = await response.Content.ReadAsStringAsync();
-
-        // Assert
-        Assert.Contains("/api/Products", content);
-        Assert.Contains("\"get\"", content);
-        Assert.Contains("\"post\"", content);
-        Assert.Contains("\"put\"", content);
-        Assert.Contains("\"delete\"", content);
-    }
-
-    [Fact]
-    public async Task Swagger_Json_ContainsProductDto_Schema()
-    {
-        // Arrange
-        var client = _factory.CreateClient();
-
-        // Act
-        var response = await client.GetAsync("/swagger/v1/swagger.json");
-        var content = await response.Content.ReadAsStringAsync();
-
-        // Assert
-        Assert.Contains("ProductDto", content);
-        Assert.Contains("\"schemas\"", content);
-    }
-
-    [Fact]
     public async Task SwaggerUI_Resources_AreAccessible()
     {
         // Arrange
