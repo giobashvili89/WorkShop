@@ -185,13 +185,6 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
 - `GET /api/orders` - Get all orders (Admin only)
 - `DELETE /api/orders/{id}` - Cancel an order
 
-### Products
-- `GET /api/products` - Get all products
-- `GET /api/products/{id}` - Get a product by ID
-- `POST /api/products` - Create a new product
-- `PUT /api/products/{id}` - Update a product
-- `DELETE /api/products/{id}` - Delete a product
-
 ## Features
 
 ### E-commerce Features
@@ -313,3 +306,13 @@ For production deployments:
    curl -X GET http://localhost:5000/api/books \
      -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
    ```
+
+## Documentation
+
+For more detailed information about specific aspects of the project, please refer to the following documentation:
+
+- **[Development Workflow](DEVELOPMENT_WORKFLOW.md)** - Development process and best practices for contributing to the project
+- **[Database Troubleshooting](DATABASE_TROUBLESHOOTING.md)** - Solutions to common database issues and migration problems
+- **[Error Handling Implementation](ERROR_HANDLING_IMPLEMENTATION.md)** - Error handling architecture and implementation details
+- **[Routing Implementation](ROUTING_IMPLEMENTATION.md)** - Routing configuration and implementation guide
+- **[Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Overview of key implementation decisions and architectural choices
