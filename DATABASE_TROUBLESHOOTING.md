@@ -24,6 +24,9 @@ This error occurs when the application tries to query the Categories table befor
 2. **Connection failure**: Application can't connect to PostgreSQL
 3. **Migration failure**: Migrations failed to apply (logged but app continued running)
 4. **Timing issue**: Application code ran before migrations completed
+5. **Application startup failure**: Core services (logging, DI container) failed to initialize
+
+> **Note**: If you see error messages on the console instead of in logs, it may indicate the logging infrastructure failed to initialize. This is rare but can happen if there are severe configuration or dependency issues.
 
 ### Solution Steps
 
