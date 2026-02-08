@@ -1,8 +1,20 @@
+import { NavLink, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 
-function Header({ onLogout, currentView, setCurrentView }) {
+function Header({ onLogout }) {
   const username = authService.getUsername();
   const isAdmin = authService.isAdmin();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    onLogout();
+    navigate('/login', { replace: true });
+  };
+
+  const navLinkClass = ({ isActive }) =>
+    `px-4 py-2 rounded-lg transition text-white ${
+      isActive ? 'bg-blue-700' : 'bg-blue-600 hover:bg-blue-500'
+    }`;
 
   return (
     <header className="bg-blue-600 text-white shadow-lg">
@@ -11,51 +23,23 @@ function Header({ onLogout, currentView, setCurrentView }) {
           <div className="flex items-center space-x-6">
             <h1 className="text-2xl font-bold">📚 BookShop</h1>
             <nav className="flex space-x-4">
-              <button
-                onClick={() => setCurrentView('books')}
-                className={`px-4 py-2 rounded-lg transition text-white ${
-                  currentView === 'books'
-                    ? 'bg-blue-700'
-                    : 'bg-blue-600 hover:bg-blue-500'
-                }`}
-              >
+              <NavLink to="/books" className={navLinkClass}>
                 Browse Books
-              </button>
+              </NavLink>
               {isAdmin && (
                 <>
-                  <button
-                    onClick={() => setCurrentView('admin')}
-                    className={`px-4 py-2 rounded-lg transition text-white ${
-                      currentView === 'admin'
-                        ? 'bg-blue-700'
-                        : 'bg-blue-600 hover:bg-blue-500'
-                    }`}
-                  >
+                  <NavLink to="/admin/books" className={navLinkClass}>
                     Manage Books
-                  </button>
-                  <button
-                    onClick={() => setCurrentView('adminOrders')}
-                    className={`px-4 py-2 rounded-lg transition text-white ${
-                      currentView === 'adminOrders'
-                        ? 'bg-blue-700'
-                        : 'bg-blue-600 hover:bg-blue-500'
-                    }`}
-                  >
+                  </NavLink>
+                  <NavLink to="/admin/orders" className={navLinkClass}>
                     Manage Orders
-                  </button>
+                  </NavLink>
                 </>
               )}
               {!isAdmin && (
-                <button
-                  onClick={() => setCurrentView('orders')}
-                  className={`px-4 py-2 rounded-lg transition text-white ${
-                    currentView === 'orders'
-                      ? 'bg-blue-700'
-                      : 'bg-blue-600 hover:bg-blue-500'
-                  }`}
-                >
+                <NavLink to="/orders" className={navLinkClass}>
                   My Orders
-                </button>
+                </NavLink>
               )}
             </nav>
           </div>
@@ -65,7 +49,7 @@ function Header({ onLogout, currentView, setCurrentView }) {
               {isAdmin && <span className="ml-2 px-2 py-1 bg-yellow-500 text-xs rounded">Admin</span>}
             </span>
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
             >
               Logout
