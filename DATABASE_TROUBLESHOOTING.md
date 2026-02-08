@@ -161,9 +161,9 @@ docker-compose logs api
 ```
 
 Look for errors like:
-- "An error occurred while initializing the database"
+- "CRITICAL: Database initialization failed! The application may not function correctly."
 - "Failed to connect to database"
-- "Migration failed"
+- "An error occurred using the connection to database"
 
 ## Prevention
 
