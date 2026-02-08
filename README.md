@@ -1,19 +1,56 @@
-# WorkShop - Book Selling Platform
+# WorkShop - Online Bookstore Platform
 
-A full-stack book selling application with .NET 10 API (Clean Architecture) and React.js frontend featuring JWT authentication, role-based access control, shopping cart, and PostgreSQL database.
+A comprehensive full-stack bookstore application for selling physical books (paper books, not digital PDFs). Built with .NET 10 API following Clean Architecture principles and a modern React.js frontend, featuring JWT authentication, role-based access control, shopping cart functionality, order tracking, and PostgreSQL database.
+
+## Overview
+
+WorkShop is an e-commerce platform designed for bookstores to manage their inventory and process customer orders with delivery tracking. Customers can browse books, place orders, and track shipments, while administrators manage the book catalog and update order tracking information.
+
+## Screenshots
+
+### Customer Views
+
+**Book Store - Browse and Shop**
+
+![Book Store](docs/screenshots/book-store.png)
+*Browse books by category, view details, and add items to cart*
+
+**Order History and Tracking**
+
+![Order History](docs/screenshots/order-history.png)
+*Track orders with delivery information and shipping status*
+
+### Admin Dashboard
+
+**Book Management**
+
+![Book Management](docs/screenshots/book-management.png)
+*Add, edit, and manage book inventory with filtering options*
+
+**Order Management**
+
+![Order Management](docs/screenshots/order-management.png)
+*View all orders, update tracking status, and manage deliveries*
+
+**User Management**
+
+![User Management](docs/screenshots/user-management.png)
+*Manage customer accounts and admin users*
 
 ## Project Structure
 
 ```
 WorkShop/
 ├── src/
-│   ├── WorkShop.Domain/          # Domain layer - Entities (Book, User, Order, OrderItem, Product)
-│   ├── WorkShop.Application/     # Application layer - Business logic, DTOs, Interfaces, Validators
-│   ├── WorkShop.Infrastructure/  # Infrastructure layer - Implementations, DbContext, Services
-│   └── WorkShop.API/             # API layer - Controllers, Endpoints
+│   ├── WorkShop.Domain/          # Domain layer - Core entities (Book, User, Order, OrderItem, Category)
+│   ├── WorkShop.Application/     # Application layer - Business logic, DTOs, interfaces, validation rules
+│   ├── WorkShop.Infrastructure/  # Infrastructure layer - Data access, service implementations, DbContext
+│   └── WorkShop.API/             # API layer - Controllers, middleware, API endpoints
 ├── tests/
-│   └── WorkShop.API.Tests/       # Unit tests for API
-└── client/                       # React.js frontend with Tailwind CSS
+│   ├── WorkShop.API.Tests/           # API integration and unit tests
+│   ├── WorkShop.Application.Tests/   # Application layer tests
+│   └── WorkShop.Infrastructure.Tests/# Infrastructure layer tests
+└── client/                       # React.js frontend application with Tailwind CSS
 ```
 
 ## Prerequisites
@@ -30,11 +67,11 @@ WorkShop/
 
 ## Getting Started
 
-> **Having database issues?** Check the [DATABASE_TROUBLESHOOTING.md](DATABASE_TROUBLESHOOTING.md) guide for solutions to common database errors including "relation 'Categories' does not exist" and migration issues.
+> **Experiencing database issues?** Refer to the [DATABASE_TROUBLESHOOTING.md](DATABASE_TROUBLESHOOTING.md) guide for solutions to common database errors, including "relation 'Categories' does not exist" and migration-related issues.
 
 ### Option 1: Running with Docker (Recommended)
 
-The easiest way to run the entire application stack is using Docker Compose:
+The easiest way to run the complete application stack is using Docker Compose:
 
 1. Clone the repository:
    ```bash
@@ -42,7 +79,7 @@ The easiest way to run the entire application stack is using Docker Compose:
    cd WorkShop
    ```
 
-2. Start all services (API, React client, and PostgreSQL):
+2. Start all services (API, React client, and PostgreSQL database):
    ```bash
    docker-compose up -d
    ```
@@ -50,7 +87,7 @@ The easiest way to run the entire application stack is using Docker Compose:
 3. Access the applications:
    - **React Client**: http://localhost:3000
    - **API**: http://localhost:5000
-   - **PostgreSQL**: localhost:5432
+   - **PostgreSQL Database**: localhost:5432
 
 4. View logs:
    ```bash
@@ -68,7 +105,7 @@ The easiest way to run the entire application stack is using Docker Compose:
    docker-compose down
    ```
 
-6. Stop and remove volumes (this will delete the database data):
+6. Stop and remove all containers including volumes (this will delete all database data):
    ```bash
    docker-compose down -v
    ```
@@ -92,14 +129,14 @@ docker build -t workshop-client -f client/Dockerfile ./client
 
 #### Docker Environment Variables
 
-The `docker-compose.yml` file includes default environment variables. For production, copy `.env.example` to `.env` and update the values:
+The `docker-compose.yml` file includes default environment variables for development. For production deployments, create a `.env` file with secure values:
 
 ```bash
 cp .env.example .env
-# Edit .env with your secure values
+# Edit the .env file with your secure credentials
 ```
 
-Example `.env` file:
+Example `.env` file configuration:
 ```env
 POSTGRES_DB=workshop_db
 POSTGRES_USER=your_user
@@ -111,12 +148,12 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
 
 #### Database Setup
 
-1. Install PostgreSQL and create a database:
+1. Install PostgreSQL and create a database for the application:
    ```bash
    createdb workshop_db
    ```
 
-2. Update the connection string in `src/WorkShop.API/appsettings.json` if needed:
+2. Update the connection string in `src/WorkShop.API/appsettings.json` to match your PostgreSQL configuration:
    ```json
    "ConnectionStrings": {
      "DefaultConnection": "Host=localhost;Port=5432;Database=workshop_db;Username=postgres;Password=postgres"
@@ -125,24 +162,24 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
 
 #### Backend (.NET API)
 
-1. Navigate to the repository root:
+1. Navigate to the repository root directory:
    ```bash
    cd WorkShop
    ```
 
-2. Restore dependencies and build:
+2. Restore NuGet packages and build the solution:
    ```bash
    dotnet restore
    dotnet build
    ```
 
-3. Run the API:
+3. Run the API project:
    ```bash
    cd src/WorkShop.API
    dotnet run
    ```
 
-   The API will be available at `http://localhost:5000` (or `https://localhost:5001`)
+   The API will be accessible at `http://localhost:5000` (HTTP) or `https://localhost:5001` (HTTPS)
 
 #### Frontend (React)
 
@@ -151,48 +188,65 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
    cd client
    ```
 
-2. Install dependencies:
+2. Install npm dependencies:
    ```bash
    npm install
    ```
 
-3. Start the development server:
+3. Start the Vite development server:
    ```bash
    npm run dev
    ```
 
-   The React app will be available at `http://localhost:5173` (or the port shown in the terminal)
+   The React application will be available at `http://localhost:5173` (the exact port will be displayed in the terminal)
 
 ## API Endpoints
 
-### Authentication (No auth required)
-- `POST /api/auth/register` - Register a new user (defaults to Customer role)
-- `POST /api/auth/login` - Login and receive JWT token with user role
+### Authentication (Public - No Authentication Required)
+- `POST /api/auth/register` - Register a new customer account
+- `POST /api/auth/login` - Login and receive JWT token with user role information
 
-### Books (Public GET, Admin-only POST/PUT/DELETE)
-- `GET /api/books` - Get all books (public)
-- `GET /api/books/{id}` - Get a book by ID (public)
-- `GET /api/books/author/{author}` - Filter books by author (public)
+### Books (Public Read Access, Admin-Only Write Access)
+- `GET /api/books` - Retrieve all available books (public)
+- `GET /api/books/{id}` - Retrieve a specific book by ID (public)
+- `GET /api/books/author/{author}` - Filter books by author name (public)
 - `GET /api/books/category/{category}` - Filter books by category (public)
-- `POST /api/books` - Create a new book (Admin only)
-- `PUT /api/books/{id}` - Update a book (Admin only)
-- `DELETE /api/books/{id}` - Delete a book (Admin only)
+- `POST /api/books` - Add a new book to the catalog (Admin only)
+- `PUT /api/books/{id}` - Update book information (Admin only)
+- `DELETE /api/books/{id}` - Remove a book from the catalog (Admin only)
 
-### Orders (Requires JWT authentication)
-- `POST /api/orders` - Create a new order (place an order)
-- `GET /api/orders/{id}` - Get order details
-- `GET /api/orders/my-orders` - Get current user's order history
-- `GET /api/orders` - Get all orders (Admin only)
+### Orders (Requires JWT Authentication)
+- `POST /api/orders` - Place a new order with delivery information
+- `GET /api/orders/{id}` - Retrieve order details including shipping and tracking information
+- `GET /api/orders/my-orders` - Retrieve current user's complete order history
+- `GET /api/orders` - Retrieve all orders (Admin only)
 - `DELETE /api/orders/{id}` - Cancel an order
 
 ## Features
 
+### User Roles
+
+The platform supports two distinct user types:
+
+#### Admin (Shop Owner/Participant)
+- **Book Management**: Add new books to the catalog, update book information (title, author, price, stock), and remove books
+- **Order Management**: View all customer orders and update tracking history with shipping information
+- **Inventory Control**: Monitor and manage book stock levels
+
+#### Customer (Buyer)
+- **Book Browsing**: View the complete catalog of available books with detailed information
+- **Shopping Cart**: Add books to basket and manage quantities before checkout
+- **Order Placement**: Purchase books and provide delivery address information
+- **Order Tracking**: View order details, shipping status, and tracking information
+- **Account Management**: Register as a new user and recover forgotten passwords
+
 ### E-commerce Features
-- **Book Shopping**: Browse books in an attractive card-based layout
-- **Shopping Cart**: Add books to cart, adjust quantities, and checkout
-- **Order Management**: Track order history and cancel orders
-- **Stock Management**: Real-time stock tracking with quantity validation
-- **Role-Based Access**: Admin users can manage inventory, customers can browse and purchase
+- **Book Shopping**: Browse physical books in an attractive card-based layout
+- **Shopping Cart**: Add books to cart, adjust quantities, and proceed to checkout
+- **Order Management**: Track order history, view shipping details, and cancel orders if needed
+- **Delivery Management**: Customers provide shipping addresses; sellers update tracking information
+- **Stock Management**: Real-time stock tracking with quantity validation to prevent overselling
+- **Role-Based Access**: Administrators can manage inventory and orders; customers can browse and purchase
 
 ### Authentication & Authorization
 - **JWT Authentication**: Secure API endpoints with JSON Web Tokens
@@ -200,60 +254,71 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
 - **Secure Password Hashing**: Using PBKDF2 with SHA256
 
 ### Technical Features
-- **Clean Architecture**: Backend follows clean architecture principles with clear separation of concerns
-- **PostgreSQL Database**: Persistent data storage with Entity Framework Core
-- **Docker Support**: Complete Docker and Docker Compose configuration for easy deployment
-- **Book Management**: Full CRUD operations with filtering by author and category
-- **RESTful API**: Complete REST API with proper status codes
-- **CORS Enabled**: API configured to accept requests from React frontend
-- **Modern React**: Frontend built with React using Vite and Tailwind CSS
-- **Responsive UI**: Beautiful, responsive interface optimized for all devices
-- **Unit Tests**: Comprehensive test coverage with xUnit
-- **FluentValidation**: Input validation with FluentValidation library
+- **Clean Architecture**: Backend follows clean architecture principles with clear separation of concerns across Domain, Application, Infrastructure, and API layers
+- **PostgreSQL Database**: Persistent data storage using Entity Framework Core with code-first migrations
+- **Docker Support**: Complete Docker and Docker Compose configuration for streamlined deployment
+- **Book Management**: Full CRUD (Create, Read, Update, Delete) operations with filtering capabilities by author and category
+- **RESTful API**: Well-structured REST API implementation with appropriate HTTP status codes
+- **CORS Configuration**: API configured to accept cross-origin requests from the React frontend
+- **Modern React**: Frontend built with React 18+ using Vite build tool and Tailwind CSS for styling
+- **Responsive Design**: Beautiful, responsive user interface optimized for desktop, tablet, and mobile devices
+- **Comprehensive Testing**: Unit test coverage using xUnit testing framework
+- **Input Validation**: Robust request validation using FluentValidation library
 
 ### Demo Accounts
-The application is seeded with demo accounts:
-- **Admin**: username: `admin`, password: `admin1`
-- **Customer**: username: `customer`, password: `customer1`
+The application includes pre-configured demo accounts for testing:
+- **Admin Account**: 
+  - Username: `admin`
+  - Password: `admin1`
+  - Capabilities: Full access to book and order management
+- **Customer Account**: 
+  - Username: `customer`
+  - Password: `customer1`
+  - Capabilities: Browse, purchase, and track orders
 
 ## Technologies Used
 
 ### DevOps & Deployment
-- Docker & Docker Compose
-- Multi-stage builds for optimized images
-- PostgreSQL 16 Alpine for database
+- Docker & Docker Compose for containerization
+- Multi-stage Docker builds for optimized container images
+- PostgreSQL 16 Alpine for lightweight database container
 
 ### Backend
-- .NET 10
+- .NET 10 SDK
 - ASP.NET Core Web API
-- Entity Framework Core 10
-- PostgreSQL (via Npgsql)
-- JWT Bearer Authentication
-- Clean Architecture pattern
-- xUnit for testing
+- Entity Framework Core 10 with code-first migrations
+- PostgreSQL database (via Npgsql provider)
+- JWT Bearer Authentication for secure API access
+- Clean Architecture design pattern
+- xUnit testing framework
 
 ### Frontend
-- React.js
-- Vite
-- Tailwind CSS
-- Modern ES6+ JavaScript
+- React.js 18+ with Hooks
+- Vite - Next-generation frontend build tool
+- Tailwind CSS for utility-first styling
+- Modern ES6+ JavaScript/JSX
 
 ## Running Tests
 
-Run all tests:
+Execute all tests across the solution:
 ```bash
 dotnet test
 ```
 
-Run tests with detailed output:
+Run tests with detailed console output:
 ```bash
 cd tests/WorkShop.API.Tests
 dotnet test --logger "console;verbosity=detailed"
 ```
 
+Run tests for a specific project:
+```bash
+dotnet test tests/WorkShop.Application.Tests/WorkShop.Application.Tests.csproj
+```
+
 ## JWT Configuration
 
-The JWT settings can be configured in `appsettings.json`:
+JWT settings can be customized in the `appsettings.json` file:
 ```json
 "Jwt": {
   "Secret": "YourSuperSecretKeyForJWTTokenGeneration12345",
@@ -262,46 +327,48 @@ The JWT settings can be configured in `appsettings.json`:
 }
 ```
 
-**Important**: Change the `Secret` value in production to a secure random string (at least 32 characters).
+**Security Warning**: Always change the `Secret` value in production environments to a cryptographically secure random string (minimum 32 characters recommended).
 
 ## Security Best Practices
 
 ### Password Security
-The application uses PBKDF2 (Password-Based Key Derivation Function 2) with the following configuration:
+The application implements PBKDF2 (Password-Based Key Derivation Function 2) for secure password hashing with the following configuration:
 - **Algorithm**: SHA256
-- **Iterations**: 100,000
+- **Iterations**: 100,000 (protection against brute-force attacks)
 - **Salt Size**: 16 bytes (randomly generated per password)
 - **Hash Size**: 32 bytes
 
-This provides strong protection against brute-force and rainbow table attacks.
+This implementation provides robust protection against brute-force and rainbow table attacks.
 
 ### Configuration Security
-For production deployments:
-1. **Never commit sensitive credentials** to version control
-2. Use **environment variables** or **Azure Key Vault** for:
+For production deployments, follow these best practices:
+1. **Never commit sensitive credentials** to version control systems
+2. Use **environment variables** or **Azure Key Vault** for storing:
    - Database connection strings
    - JWT secret keys
-   - Any other sensitive configuration
-3. See `appsettings.Sample.json` for the configuration template
-4. Use **User Secrets** in development: `dotnet user-secrets init`
+   - Any other sensitive configuration values
+3. Refer to `appsettings.Sample.json` for the configuration template
+4. Use **User Secrets** during development: `dotnet user-secrets init`
 
 ## Using the API with Authentication
 
-1. Register a new user:
+Example workflow for API authentication:
+
+1. Register a new user account:
    ```bash
    curl -X POST http://localhost:5000/api/auth/register \
      -H "Content-Type: application/json" \
      -d '{"username":"admin","email":"admin@example.com","password":"admin123"}'
    ```
 
-2. Login to get a JWT token:
+2. Login to receive a JWT token:
    ```bash
    curl -X POST http://localhost:5000/api/auth/login \
      -H "Content-Type: application/json" \
      -d '{"username":"admin","password":"admin123"}'
    ```
 
-3. Use the token in subsequent requests:
+3. Include the token in subsequent authenticated requests:
    ```bash
    curl -X GET http://localhost:5000/api/books \
      -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
