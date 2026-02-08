@@ -190,7 +190,7 @@ function AdminOrderManagement() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Admin Order Management</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Order Management</h1>
 
       {/* Filters Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
