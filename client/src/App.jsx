@@ -64,26 +64,22 @@ function App() {
         {/* Login route */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Protected routes with layout */}
+        {/* Public routes with layout */}
         <Route
           path="/"
           element={
-            <ProtectedRoute>
-              <Layout onLogout={handleLogout}>
-                <BookList />
-              </Layout>
-            </ProtectedRoute>
+            <Layout onLogout={handleLogout}>
+              <BookList />
+            </Layout>
           }
         />
 
         <Route
           path="/books"
           element={
-            <ProtectedRoute>
-              <Layout onLogout={handleLogout}>
-                <BookList />
-              </Layout>
-            </ProtectedRoute>
+            <Layout onLogout={handleLogout}>
+              <BookList />
+            </Layout>
           }
         />
 
