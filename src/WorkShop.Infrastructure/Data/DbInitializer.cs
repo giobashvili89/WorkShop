@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WorkShop.Domain.Entities;
 using WorkShop.Domain.Enums;
 using WorkShop.Infrastructure.Services;
@@ -7,31 +8,47 @@ namespace WorkShop.Infrastructure.Data;
 
 public static class DbInitializer
 {
-    public static async Task InitializeAsync(AppDbContext context)
+    public static async Task InitializeAsync(AppDbContext context, ILogger logger)
     {
-        // Apply any pending migrations
-        await context.Database.MigrateAsync();
-
-        // Check if data already exists (after migrations are applied)
-        if (await context.Categories.AnyAsync())
+        try
         {
-            return;  
+            // Ensure database exists and apply all pending migrations
+            // MigrateAsync() handles both creating the database (if needed) and applying migrations
+            logger.LogInformation("Ensuring database exists and applying migrations...");
+            await context.Database.MigrateAsync();
+            logger.LogInformation("Database migration completed successfully.");
+
+            // Check if data already exists (after migrations are applied)
+            if (await context.Categories.AnyAsync())
+            {
+                logger.LogInformation("Database already contains data. Skipping seeding.");
+                return;  
+            }
+
+            logger.LogInformation("Database is empty. Starting seeding process...");
+
+            // Seed Categories first
+            await SeedCategoriesAsync(context, logger);
+            
+            // Seed Books - 100 records
+            await SeedBooksAsync(context, logger);
+
+            // Seed Default Users (Admin and Customer)
+            await SeedDefaultUsersAsync(context, logger);
+
+            await context.SaveChangesAsync();
+            logger.LogInformation("Database seeding completed successfully.");
         }
-
-        // Seed Categories first
-        await SeedCategoriesAsync(context);
-        
-        // Seed Books - 100 records
-        await SeedBooksAsync(context);
-
-        // Seed Default Users (Admin and Customer)
-        await SeedDefaultUsersAsync(context);
-
-        await context.SaveChangesAsync();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error occurred during database initialization.");
+            throw;
+        }
     }
 
-    private static async Task SeedCategoriesAsync(AppDbContext context)
+    private static async Task SeedCategoriesAsync(AppDbContext context, ILogger logger)
     {
+        logger.LogInformation("Seeding categories...");
         var categories = new[]
         {
             new Category { Name = "Fiction", Description = "Fictional literature including novels and short stories" },
@@ -48,10 +65,12 @@ public static class DbInitializer
 
         await context.Categories.AddRangeAsync(categories);
         await context.SaveChangesAsync();
+        logger.LogInformation("Seeded {Count} categories.", categories.Length);
     }
 
-    private static async Task SeedBooksAsync(AppDbContext context)
+    private static async Task SeedBooksAsync(AppDbContext context, ILogger logger)
     {
+        logger.LogInformation("Seeding books...");
         // Get all categories to use their IDs
         var categories = await context.Categories.ToListAsync();
         var categoryDict = categories.ToDictionary(c => c.Name, c => c.Id);
@@ -94,10 +113,12 @@ public static class DbInitializer
         }
 
         await context.Books.AddRangeAsync(books);
+        logger.LogInformation("Seeded {Count} books.", books.Count);
     }
 
-    private static async Task SeedDefaultUsersAsync(AppDbContext context)
+    private static async Task SeedDefaultUsersAsync(AppDbContext context, ILogger logger)
     {
+        logger.LogInformation("Seeding default users...");
         // Create default admin user
         // Note: Password validation requires minimum 6 characters, using "admin1" instead of "admin"
         var adminPasswordHash = PasswordHasher.HashPassword("admin1");
@@ -126,5 +147,7 @@ public static class DbInitializer
         };
 
         await context.Users.AddAsync(customerUser);
+        
+        logger.LogInformation("Seeded 2 default users (admin and customer).");
     }
 }
