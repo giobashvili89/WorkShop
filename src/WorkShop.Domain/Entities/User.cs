@@ -10,6 +10,8 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
     public UserRole Role { get; set; } = UserRole.Customer;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string? PasswordResetToken { get; set; }
+    public DateTime? PasswordResetTokenExpiry { get; set; }
     
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

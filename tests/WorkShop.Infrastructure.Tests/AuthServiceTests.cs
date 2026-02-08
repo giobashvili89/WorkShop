@@ -196,4 +196,159 @@ public class AuthServiceTests
             async () => await service.LoginAsync(loginDto));
         Assert.Equal("Invalid username or password.", exception.Message);
     }
+
+    [Fact]
+    public async Task ForgotPasswordAsync_ReturnsResetToken_WhenEmailExists()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var configuration = GetConfiguration();
+        var service = new AuthService(context, configuration);
+
+        // Register a user first
+        var registerDto = new RegisterRequestModel
+        {
+            Username = "testuser",
+            Email = "test@example.com",
+            Password = "password123"
+        };
+        await service.RegisterAsync(registerDto);
+
+        var forgotPasswordDto = new ForgotPasswordRequestModel
+        {
+            Email = "test@example.com"
+        };
+
+        // Act
+        var resetToken = await service.ForgotPasswordAsync(forgotPasswordDto);
+
+        // Assert
+        Assert.NotNull(resetToken);
+        Assert.NotEmpty(resetToken);
+        
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == "test@example.com");
+        Assert.NotNull(user);
+        Assert.Equal(resetToken, user.PasswordResetToken);
+        Assert.NotNull(user.PasswordResetTokenExpiry);
+        Assert.True(user.PasswordResetTokenExpiry > DateTime.UtcNow);
+    }
+
+    [Fact]
+    public async Task ForgotPasswordAsync_ThrowsBadRequestException_WhenEmailDoesNotExist()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var configuration = GetConfiguration();
+        var service = new AuthService(context, configuration);
+
+        var forgotPasswordDto = new ForgotPasswordRequestModel
+        {
+            Email = "nonexistent@example.com"
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            async () => await service.ForgotPasswordAsync(forgotPasswordDto));
+        Assert.Equal("User with email 'nonexistent@example.com' was not found.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_UpdatesPassword_WhenTokenIsValid()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var configuration = GetConfiguration();
+        var service = new AuthService(context, configuration);
+
+        // Register a user and request password reset
+        var registerDto = new RegisterRequestModel
+        {
+            Username = "testuser",
+            Email = "test@example.com",
+            Password = "oldpassword"
+        };
+        await service.RegisterAsync(registerDto);
+
+        var forgotPasswordDto = new ForgotPasswordRequestModel
+        {
+            Email = "test@example.com"
+        };
+        var resetToken = await service.ForgotPasswordAsync(forgotPasswordDto);
+
+        var resetPasswordDto = new ResetPasswordRequestModel
+        {
+            Token = resetToken,
+            NewPassword = "newpassword123"
+        };
+
+        // Act
+        await service.ResetPasswordAsync(resetPasswordDto);
+
+        // Assert
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == "test@example.com");
+        Assert.NotNull(user);
+        Assert.Null(user.PasswordResetToken);
+        Assert.Null(user.PasswordResetTokenExpiry);
+        
+        // Verify new password works
+        var loginDto = new LoginRequestModel
+        {
+            Username = "testuser",
+            Password = "newpassword123"
+        };
+        var loginResult = await service.LoginAsync(loginDto);
+        Assert.NotNull(loginResult);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_ThrowsBadRequestException_WhenTokenIsInvalid()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var configuration = GetConfiguration();
+        var service = new AuthService(context, configuration);
+
+        var resetPasswordDto = new ResetPasswordRequestModel
+        {
+            Token = "invalidtoken",
+            NewPassword = "newpassword123"
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            async () => await service.ResetPasswordAsync(resetPasswordDto));
+        Assert.Equal("Invalid reset token.", exception.Message);
+    }
+
+    [Fact]
+    public async Task ResetPasswordAsync_ThrowsBadRequestException_WhenTokenIsExpired()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var configuration = GetConfiguration();
+        var service = new AuthService(context, configuration);
+
+        // Create a user with an expired token
+        var user = new User
+        {
+            Username = "testuser",
+            Email = "test@example.com",
+            PasswordHash = PasswordHasher.HashPassword("password123"),
+            PasswordResetToken = "expiredtoken",
+            PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(-1) // Expired 1 hour ago
+        };
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        var resetPasswordDto = new ResetPasswordRequestModel
+        {
+            Token = "expiredtoken",
+            NewPassword = "newpassword123"
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
+            async () => await service.ResetPasswordAsync(resetPasswordDto));
+        Assert.Equal("Reset token has expired.", exception.Message);
+    }
 }

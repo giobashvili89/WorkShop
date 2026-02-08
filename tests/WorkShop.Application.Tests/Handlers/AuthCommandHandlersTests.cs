@@ -121,4 +121,50 @@ public class AuthCommandHandlersTests
         Assert.Null(result);
         mockAuthService.Verify(s => s.LoginAsync(loginRequest), Times.Once);
     }
+
+    [Fact]
+    public async Task ForgotPasswordCommandHandler_ReturnsResetToken_WhenEmailExists()
+    {
+        // Arrange
+        var mockAuthService = new Mock<IAuthService>();
+        var forgotPasswordRequest = new ForgotPasswordRequestModel
+        {
+            Email = "test@example.com"
+        };
+        var expectedToken = "reset-token-12345";
+        mockAuthService.Setup(s => s.ForgotPasswordAsync(forgotPasswordRequest)).ReturnsAsync(expectedToken);
+        
+        var handler = new ForgotPasswordCommandHandler(mockAuthService.Object);
+        var command = new ForgotPasswordCommand(forgotPasswordRequest);
+        
+        // Act
+        var result = await handler.Handle(command, CancellationToken.None);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(expectedToken, result);
+        mockAuthService.Verify(s => s.ForgotPasswordAsync(forgotPasswordRequest), Times.Once);
+    }
+
+    [Fact]
+    public async Task ResetPasswordCommandHandler_ResetsPassword_WhenTokenIsValid()
+    {
+        // Arrange
+        var mockAuthService = new Mock<IAuthService>();
+        var resetPasswordRequest = new ResetPasswordRequestModel
+        {
+            Token = "valid-token",
+            NewPassword = "NewPassword123!"
+        };
+        mockAuthService.Setup(s => s.ResetPasswordAsync(resetPasswordRequest)).Returns(Task.CompletedTask);
+        
+        var handler = new ResetPasswordCommandHandler(mockAuthService.Object);
+        var command = new ResetPasswordCommand(resetPasswordRequest);
+        
+        // Act
+        await handler.Handle(command, CancellationToken.None);
+        
+        // Assert
+        mockAuthService.Verify(s => s.ResetPasswordAsync(resetPasswordRequest), Times.Once);
+    }
 }
