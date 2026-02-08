@@ -1,4 +1,4 @@
-# WorkShop - Online Bookstore Platform
+# WorkShop - Online Book Shop Platform
 
 This project is an online book shop for physical (paper) books, where customers can purchase books and have them delivered to a specified shipping address. The platform supports the full order lifecycle, from browsing and purchasing books to shipment and delivery tracking.
 
