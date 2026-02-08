@@ -1,41 +1,12 @@
 # WorkShop - Online Bookstore Platform
 
-A comprehensive full-stack bookstore application for selling physical books (paper books, not digital PDFs). Built with .NET 10 API following Clean Architecture principles and a modern React.js frontend, featuring JWT authentication, role-based access control, shopping cart functionality, order tracking, and PostgreSQL database.
+This project is an online book shop for physical (paper) books, where customers can purchase books and have them delivered to a specified shipping address. The platform supports the full order lifecycle, from browsing and purchasing books to shipment and delivery tracking.
 
-## Overview
+There are two types of users: Admins and Customers.
 
-WorkShop is an e-commerce platform designed for bookstores to manage their inventory and process customer orders with delivery tracking. Customers can browse books, place orders, and track shipments, while administrators manage the book catalog and update order tracking information.
+Admins (shop owners or authorized participants) are responsible for managing the store. They can add, update, and delete books, as well as manage customer orders, including updating shipping and tracking information.
 
-## Screenshots
-
-### Customer Views
-
-**Book Store - Browse and Shop**
-
-![Book Store](docs/screenshots/book-store.png)
-*Browse books by category, view details, and add items to cart*
-
-**Order History and Tracking**
-
-![Order History](docs/screenshots/order-history.png)
-*Track orders with delivery information and shipping status*
-
-### Admin Dashboard
-
-**Book Management**
-
-![Book Management](docs/screenshots/book-management.png)
-*Add, edit, and manage book inventory with filtering options*
-
-**Order Management**
-
-![Order Management](docs/screenshots/order-management.png)
-*View all orders, update tracking status, and manage deliveries*
-
-**User Management**
-
-![User Management](docs/screenshots/user-management.png)
-*Manage customer accounts and admin users*
+Customers can browse the available books, add them to a shopping basket, and place orders. They can view detailed order information, including shipping status and tracking history. Customers can also register for a new account and recover their password if needed.
 
 ## Project Structure
 
