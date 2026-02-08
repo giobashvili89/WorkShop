@@ -234,7 +234,7 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task ForgotPasswordAsync_ThrowsUserNotFoundException_WhenEmailDoesNotExist()
+    public async Task ForgotPasswordAsync_ThrowsBadRequestException_WhenEmailDoesNotExist()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -247,7 +247,7 @@ public class AuthServiceTests
         };
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<UserNotFoundException>(
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
             async () => await service.ForgotPasswordAsync(forgotPasswordDto));
         Assert.Equal("User with email 'nonexistent@example.com' was not found.", exception.Message);
     }

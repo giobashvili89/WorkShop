@@ -105,7 +105,7 @@ public class AuthService : IAuthService
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
         if (user == null)
-            throw new UserNotFoundException($"User with email '{request.Email}' was not found.");
+            throw new BadRequestException($"User with email '{request.Email}' was not found.");
 
         // Generate a secure reset token
         var resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
