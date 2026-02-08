@@ -194,7 +194,14 @@ If you continue to experience problems:
 
 1. **Check PostgreSQL is accessible**:
    ```bash
-   telnet localhost 5432
+   # Option 1: Using psql (most reliable)
+   psql -h localhost -p 5432 -U postgres -c '\l'
+   
+   # Option 2: Using netcat (if available)
+   nc -zv localhost 5432
+   
+   # Option 3: Using pg_isready
+   pg_isready -h localhost -p 5432
    ```
 
 2. **Verify credentials**: Ensure username/password in connection string are correct
