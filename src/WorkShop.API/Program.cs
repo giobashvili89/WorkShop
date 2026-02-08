@@ -1,5 +1,6 @@
 using FluentValidation.AspNetCore;
 using WorkShop.API.Configuration;
+using WorkShop.API.Middleware;
 using WorkShop.Application;
 using WorkShop.Infrastructure;
 using WorkShop.Infrastructure.Data;
@@ -50,6 +51,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+// Add global exception handler middleware
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

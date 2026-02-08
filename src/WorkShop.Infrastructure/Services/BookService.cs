@@ -3,6 +3,7 @@ using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 
 namespace WorkShop.Infrastructure.Services;
@@ -44,7 +45,7 @@ public class BookService : IBookService
             .Include(b => b.Category)
             .FirstOrDefaultAsync(b => b.Id == id);
         if (book == null)
-            return null;
+            throw new BookNotFoundException(id);
 
         return new BookResponseModel
         {
@@ -157,7 +158,7 @@ public class BookService : IBookService
             .Include(b => b.Category)
             .FirstOrDefaultAsync(b => b.Id == id);
         if (book == null)
-            return null;
+            throw new BookNotFoundException(id);
 
         book.Title = bookDto.Title;
         book.Author = bookDto.Author;
@@ -199,7 +200,7 @@ public class BookService : IBookService
     {
         var book = await _context.Books.FindAsync(id);
         if (book == null)
-            return false;
+            throw new BookNotFoundException(id);
 
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();

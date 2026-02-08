@@ -3,6 +3,7 @@ using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
 using WorkShop.Application.Interfaces;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 
 namespace WorkShop.Infrastructure.Services;
@@ -36,7 +37,7 @@ public class CategoryService : ICategoryService
     {
         var category = await _context.Categories.FindAsync(id);
         if (category == null)
-            return null;
+            throw new CategoryNotFoundException(id);
 
         return new CategoryResponseModel
         {
@@ -74,7 +75,7 @@ public class CategoryService : ICategoryService
     {
         var category = await _context.Categories.FindAsync(id);
         if (category == null)
-            return null;
+            throw new CategoryNotFoundException(id);
 
         category.Name = categoryDto.Name;
         category.Description = categoryDto.Description;
@@ -96,13 +97,13 @@ public class CategoryService : ICategoryService
     {
         var category = await _context.Categories.FindAsync(id);
         if (category == null)
-            return false;
+            throw new CategoryNotFoundException(id);
 
         // Check if any books are using this category
         var booksWithCategory = await _context.Books.AnyAsync(b => b.CategoryId == id);
         if (booksWithCategory)
         {
-            throw new InvalidOperationException("Cannot delete category that is assigned to books.");
+            throw new BadRequestException("Cannot delete category that is assigned to books.");
         }
 
         _context.Categories.Remove(category);

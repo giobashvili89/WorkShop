@@ -32,8 +32,6 @@ public class BooksController : ControllerBase
     public async Task<ActionResult<BookResponseModel>> GetBook(int id)
     {
         var book = await _mediator.Send(new GetBookByIdQuery(id));
-        if (book == null)
-            return NotFound();
         return Ok(book);
     }
 
@@ -64,8 +62,6 @@ public class BooksController : ControllerBase
     public async Task<ActionResult<BookResponseModel>> UpdateBook(int id, [FromBody] BookRequestModel bookDto)
     {
         var updatedBook = await _mediator.Send(new UpdateBookCommand(id, bookDto));
-        if (updatedBook == null)
-            return NotFound();
         return Ok(updatedBook);
     }
 
@@ -73,9 +69,7 @@ public class BooksController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteBook(int id)
     {
-        var result = await _mediator.Send(new DeleteBookCommand(id));
-        if (!result)
-            return NotFound();
+        await _mediator.Send(new DeleteBookCommand(id));
         return NoContent();
     }
 
