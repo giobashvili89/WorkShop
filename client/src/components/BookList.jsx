@@ -28,16 +28,35 @@ function BookList() {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
-        setCart(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart);
+        // Validate that it's an array and has expected structure
+        if (Array.isArray(parsedCart)) {
+          const validCart = parsedCart.filter(item => 
+            item && 
+            typeof item === 'object' && 
+            typeof item.bookId === 'number' && 
+            typeof item.quantity === 'number' && 
+            item.quantity > 0 &&
+            item.book &&
+            typeof item.book === 'object'
+          );
+          setCart(validCart);
+        }
       } catch (err) {
         console.error('Failed to load cart from localStorage:', err);
+        localStorage.removeItem('cart'); // Clear invalid data
       }
     }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    if (cart.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    } else {
+      // Remove cart from localStorage when empty to keep storage clean
+      localStorage.removeItem('cart');
+    }
   }, [cart]);
 
   useEffect(() => {
@@ -90,10 +109,8 @@ function BookList() {
   const addToCart = (book) => {
     // Check if user is authenticated
     if (!authService.isAuthenticated()) {
-      // Save current location for redirect after login
-      localStorage.setItem('redirectAfterLogin', window.location.pathname);
-      // Redirect to login page
-      navigate('/login');
+      // Redirect to login page with state to return here after login
+      navigate('/login', { state: { from: window.location.pathname } });
       return;
     }
 
