@@ -4,6 +4,7 @@ import { bookService } from '../services/bookService';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
 import { categoryService } from '../services/categoryService';
+import BookDetail from './BookDetail';
 
 function BookList() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function BookList() {
     homeAddress: ''
   });
   const [deliveryErrors, setDeliveryErrors] = useState({});
+  const [selectedBook, setSelectedBook] = useState(null);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -464,12 +466,18 @@ function BookList() {
         </div>
       )}
 
+      {/* Book Detail Modal */}
+      {selectedBook && (
+        <BookDetail book={selectedBook} onClose={() => setSelectedBook(null)} />
+      )}
+
       {/* Books Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {visibleBooks.map(book => (
           <div
             key={book.id}
-            className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+            className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+            onClick={() => setSelectedBook(book)}
           >
             {book.coverImagePath && !imageErrors[book.id] ? (
               <div className="h-48 overflow-hidden">
@@ -511,7 +519,10 @@ function BookList() {
 
               {!isAdmin && (
                 <button
-                  onClick={() => addToCart(book)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(book);
+                  }}
                   disabled={book.stockQuantity === 0}
                   className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
                 >
