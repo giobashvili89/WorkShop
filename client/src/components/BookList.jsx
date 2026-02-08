@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { bookService } from '../services/bookService';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
+import { categoryService } from '../services/categoryService';
 
 function BookList() {
   const navigate = useNavigate();
@@ -62,6 +63,7 @@ function BookList() {
 
   useEffect(() => {
     loadBooks();
+    loadCategories();
   }, []);
 
   const loadBooks = async () => {
@@ -69,11 +71,6 @@ function BookList() {
       setLoading(true);
       const data = await bookService.getAllBooks();
       setBooks(data);
-      
-      // Extract unique categories
-      const uniqueCategories = ['All', ...new Set(data.map(book => book.category))];
-      setCategories(uniqueCategories);
-      
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -82,9 +79,22 @@ function BookList() {
     }
   };
 
+  const loadCategories = async () => {
+    try {
+      const data = await categoryService.getAllCategories();
+      // Add 'All' option at the beginning, then category names
+      const categoryNames = ['All', ...data.map(cat => cat.name)];
+      setCategories(categoryNames);
+    } catch (err) {
+      console.error('Error loading categories:', err);
+      // Fallback to empty categories if API fails
+      setCategories(['All']);
+    }
+  };
+
   const filteredBooks = selectedCategory === 'All' 
     ? books 
-    : books.filter(book => book.category === selectedCategory);
+    : books.filter(book => book.categoryName === selectedCategory);
 
   const visibleBooks = filteredBooks.slice(0, visibleCount);
 

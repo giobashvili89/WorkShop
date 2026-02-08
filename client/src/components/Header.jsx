@@ -25,7 +25,7 @@ function Header({ onLogout }) {
             <h1 className="text-2xl font-bold">📚 BookShop</h1>
             <nav className="flex space-x-4">
               <NavLink to="/books" className={navLinkClass}>
-                Browse Books
+                Books
               </NavLink>
               {isAuthenticated && (
                 <>
