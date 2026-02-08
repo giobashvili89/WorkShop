@@ -351,4 +351,35 @@ public class AuthServiceTests
             async () => await service.ResetPasswordAsync(resetPasswordDto));
         Assert.Equal("Reset token has expired.", exception.Message);
     }
+
+    [Fact]
+    public async Task LoginAsync_ThrowsUnauthorizedException_WhenUserIsBlocked()
+    {
+        // Arrange
+        var context = GetInMemoryDbContext();
+        var configuration = GetConfiguration();
+        
+        // Create a blocked user
+        var user = new User
+        {
+            Username = "blockeduser",
+            Email = "blocked@example.com",
+            PasswordHash = PasswordHasher.HashPassword("password123"),
+            IsBlocked = true
+        };
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        var service = new AuthService(context, configuration);
+        var loginDto = new LoginRequestModel
+        {
+            Username = "blockeduser",
+            Password = "password123"
+        };
+
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<UnauthorizedException>(
+            async () => await service.LoginAsync(loginDto));
+        Assert.Equal("Your account has been blocked. Please contact support.", exception.Message);
+    }
 }
