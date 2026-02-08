@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using MediatR;
 using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
-using WorkShop.Application.Interfaces;
+using WorkShop.Application.Commands.Orders;
+using WorkShop.Application.Queries.Orders;
 
 namespace WorkShop.API.Controllers;
 
@@ -12,11 +14,11 @@ namespace WorkShop.API.Controllers;
 [Authorize]
 public class OrdersController : ControllerBase
 {
-    private readonly IOrderService _orderService;
+    private readonly IMediator _mediator;
 
-    public OrdersController(IOrderService orderService)
+    public OrdersController(IMediator mediator)
     {
-        _orderService = orderService;
+        _mediator = mediator;
     }
 
     [HttpPost]
@@ -27,7 +29,7 @@ public class OrdersController : ControllerBase
             return Unauthorized();
 
         var userId = int.Parse(userIdClaim.Value);
-        var order = await _orderService.CreateOrderAsync(userId, orderDto);
+        var order = await _mediator.Send(new CreateOrderCommand(userId, orderDto));
         
         if (order == null)
             return BadRequest("Unable to create order. Please check stock availability.");
@@ -38,7 +40,7 @@ public class OrdersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<OrderResponseModel>> GetOrder(int id)
     {
-        var order = await _orderService.GetOrderByIdAsync(id);
+        var order = await _mediator.Send(new GetOrderByIdQuery(id));
         if (order == null)
             return NotFound();
 
@@ -60,7 +62,7 @@ public class OrdersController : ControllerBase
             return Unauthorized();
 
         var userId = int.Parse(userIdClaim.Value);
-        var orders = await _orderService.GetUserOrdersAsync(userId);
+        var orders = await _mediator.Send(new GetUserOrdersQuery(userId));
         return Ok(orders);
     }
 
@@ -76,8 +78,8 @@ public class OrdersController : ControllerBase
         [FromQuery] decimal? minAmount = null,
         [FromQuery] decimal? maxAmount = null)
     {
-        var orders = await _orderService.GetAllOrdersAsync(status, trackingStatus, startDate, endDate, 
-            customerSearch, orderId, minAmount, maxAmount);
+        var orders = await _mediator.Send(new GetAllOrdersQuery(status, trackingStatus, startDate, endDate, 
+            customerSearch, orderId, minAmount, maxAmount));
         return Ok(orders);
     }
 
@@ -92,7 +94,7 @@ public class OrdersController : ControllerBase
         
         try
         {
-            var result = await _orderService.CancelOrderAsync(id, userId);
+            var result = await _mediator.Send(new CancelOrderCommand(id, userId));
             
             if (!result)
                 return NotFound();
@@ -109,7 +111,7 @@ public class OrdersController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<OrderResponseModel>> UpdateDeliveryInfo(int id, [FromBody] UpdateDeliveryInfoRequestModel model)
     {
-        var order = await _orderService.UpdateDeliveryInfoAsync(id, model);
+        var order = await _mediator.Send(new UpdateDeliveryInfoCommand(id, model));
         
         if (order == null)
             return NotFound();

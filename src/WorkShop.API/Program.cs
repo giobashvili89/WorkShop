@@ -9,6 +9,7 @@ using WorkShop.Application.Interfaces;
 using WorkShop.Application.Validators;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,11 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
     };
+});
+
+// Register MediatR
+builder.Services.AddMediatR(cfg => {
+    cfg.RegisterServicesFromAssembly(typeof(WorkShop.Application.Commands.Books.CreateBookCommand).Assembly);
 });
 
 // Register services for dependency injection

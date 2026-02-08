@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MediatR;
 using WorkShop.Application.Models.Request;
 using WorkShop.Application.Models.Response;
-using WorkShop.Application.Interfaces;
+using WorkShop.Application.Commands.Books;
+using WorkShop.Application.Queries.Books;
 
 namespace WorkShop.API.Controllers;
 
@@ -10,26 +12,26 @@ namespace WorkShop.API.Controllers;
 [Route("api/[controller]")]
 public class BooksController : ControllerBase
 {
-    private readonly IBookService _bookService;
+    private readonly IMediator _mediator;
     private readonly IWebHostEnvironment _environment;
 
-    public BooksController(IBookService bookService, IWebHostEnvironment environment)
+    public BooksController(IMediator mediator, IWebHostEnvironment environment)
     {
-        _bookService = bookService;
+        _mediator = mediator;
         _environment = environment;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BookResponseModel>>> GetAllBooks()
     {
-        var books = await _bookService.GetAllBooksAsync();
+        var books = await _mediator.Send(new GetAllBooksQuery());
         return Ok(books);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<BookResponseModel>> GetBook(int id)
     {
-        var book = await _bookService.GetBookByIdAsync(id);
+        var book = await _mediator.Send(new GetBookByIdQuery(id));
         if (book == null)
             return NotFound();
         return Ok(book);
@@ -38,14 +40,14 @@ public class BooksController : ControllerBase
     [HttpGet("author/{author}")]
     public async Task<ActionResult<IEnumerable<BookResponseModel>>> GetBooksByAuthor(string author)
     {
-        var books = await _bookService.GetBooksByAuthorAsync(author);
+        var books = await _mediator.Send(new GetBooksByAuthorQuery(author));
         return Ok(books);
     }
 
     [HttpGet("category/{category}")]
     public async Task<ActionResult<IEnumerable<BookResponseModel>>> GetBooksByCategory(string category)
     {
-        var books = await _bookService.GetBooksByCategoryAsync(category);
+        var books = await _mediator.Send(new GetBooksByCategoryQuery(category));
         return Ok(books);
     }
 
@@ -53,7 +55,7 @@ public class BooksController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BookResponseModel>> CreateBook([FromBody] BookRequestModel bookDto)
     {
-        var createdBook = await _bookService.CreateBookAsync(bookDto);
+        var createdBook = await _mediator.Send(new CreateBookCommand(bookDto));
         return CreatedAtAction(nameof(GetBook), new { id = createdBook.Id }, createdBook);
     }
 
@@ -61,7 +63,7 @@ public class BooksController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BookResponseModel>> UpdateBook(int id, [FromBody] BookRequestModel bookDto)
     {
-        var updatedBook = await _bookService.UpdateBookAsync(id, bookDto);
+        var updatedBook = await _mediator.Send(new UpdateBookCommand(id, bookDto));
         if (updatedBook == null)
             return NotFound();
         return Ok(updatedBook);
@@ -71,7 +73,7 @@ public class BooksController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteBook(int id)
     {
-        var result = await _bookService.DeleteBookAsync(id);
+        var result = await _mediator.Send(new DeleteBookCommand(id));
         if (!result)
             return NotFound();
         return NoContent();
