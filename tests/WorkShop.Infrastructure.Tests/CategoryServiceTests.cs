@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WorkShop.Application.Models.Request;
 using WorkShop.Domain.Entities;
+using WorkShop.Domain.Exceptions;
 using WorkShop.Infrastructure.Data;
 using WorkShop.Infrastructure.Services;
 
@@ -55,17 +56,16 @@ public class CategoryServiceTests
     }
 
     [Fact]
-    public async Task GetCategoryByIdAsync_ReturnsNull_WhenCategoryDoesNotExist()
+    public async Task GetCategoryByIdAsync_ThrowsCategoryNotFoundException_WhenCategoryDoesNotExist()
     {
         // Arrange
         var context = GetInMemoryDbContext();
         var service = new CategoryService(context);
 
-        // Act
-        var result = await service.GetCategoryByIdAsync(999);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<CategoryNotFoundException>(
+            async () => await service.GetCategoryByIdAsync(999));
+        Assert.Equal("Category with ID 999 was not found.", exception.Message);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class CategoryServiceTests
     }
 
     [Fact]
-    public async Task UpdateCategoryAsync_ReturnsNull_WhenCategoryDoesNotExist()
+    public async Task UpdateCategoryAsync_ThrowsCategoryNotFoundException_WhenCategoryDoesNotExist()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -129,11 +129,10 @@ public class CategoryServiceTests
             Description = "Updated Description"
         };
 
-        // Act
-        var result = await service.UpdateCategoryAsync(999, updatedDto);
-
-        // Assert
-        Assert.Null(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<CategoryNotFoundException>(
+            async () => await service.UpdateCategoryAsync(999, updatedDto));
+        Assert.Equal("Category with ID 999 was not found.", exception.Message);
     }
 
     [Fact]
@@ -156,21 +155,20 @@ public class CategoryServiceTests
     }
 
     [Fact]
-    public async Task DeleteCategoryAsync_ReturnsFalse_WhenCategoryDoesNotExist()
+    public async Task DeleteCategoryAsync_ThrowsCategoryNotFoundException_WhenCategoryDoesNotExist()
     {
         // Arrange
         var context = GetInMemoryDbContext();
         var service = new CategoryService(context);
 
-        // Act
-        var result = await service.DeleteCategoryAsync(999);
-
-        // Assert
-        Assert.False(result);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<CategoryNotFoundException>(
+            async () => await service.DeleteCategoryAsync(999));
+        Assert.Equal("Category with ID 999 was not found.", exception.Message);
     }
 
     [Fact]
-    public async Task DeleteCategoryAsync_ThrowsException_WhenCategoryHasBooks()
+    public async Task DeleteCategoryAsync_ThrowsBadRequestException_WhenCategoryHasBooks()
     {
         // Arrange
         var context = GetInMemoryDbContext();
@@ -193,7 +191,8 @@ public class CategoryServiceTests
         var service = new CategoryService(context);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<BadRequestException>(
             async () => await service.DeleteCategoryAsync(1));
+        Assert.Equal("Cannot delete category that is assigned to books.", exception.Message);
     }
 }
