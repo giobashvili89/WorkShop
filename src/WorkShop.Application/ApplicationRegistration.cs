@@ -9,12 +9,8 @@ public static class ApplicationRegistration
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Add FluentValidation Validators
+        // Add FluentValidation Validators from the Application assembly
         services.AddValidatorsFromAssemblyContaining<BookRequestModelValidator>();
-        services.AddValidatorsFromAssemblyContaining<LoginRequestModelValidator>();
-        services.AddValidatorsFromAssemblyContaining<OrderRequestModelValidator>();
-        services.AddValidatorsFromAssemblyContaining<RegisterRequestModelValidator>();
-        services.AddValidatorsFromAssemblyContaining<UpdateDeliveryInfoRequestModelValidator>();
 
         // Register MediatR
         services.AddMediatR(cfg =>
