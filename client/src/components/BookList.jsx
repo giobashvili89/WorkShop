@@ -206,7 +206,6 @@ function BookList() {
       await orderService.createOrder(orderItems, deliveryInfo);
       alert('Order placed successfully!');
       setCart([]);
-      localStorage.removeItem('cart'); // Clear cart from localStorage
       setShowCart(false);
       setShowDeliveryForm(false);
       setDeliveryInfo({
