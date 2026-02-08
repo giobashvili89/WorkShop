@@ -22,16 +22,28 @@ function Header({ onLogout, currentView, setCurrentView }) {
                 Browse Books
               </button>
               {isAdmin && (
-                <button
-                  onClick={() => setCurrentView('admin')}
-                  className={`px-4 py-2 rounded-lg transition text-white ${
-                    currentView === 'admin'
-                      ? 'bg-blue-700'
-                      : 'bg-blue-600 hover:bg-blue-500'
-                  }`}
-                >
-                  Manage Books
-                </button>
+                <>
+                  <button
+                    onClick={() => setCurrentView('admin')}
+                    className={`px-4 py-2 rounded-lg transition text-white ${
+                      currentView === 'admin'
+                        ? 'bg-blue-700'
+                        : 'bg-blue-600 hover:bg-blue-500'
+                    }`}
+                  >
+                    Manage Books
+                  </button>
+                  <button
+                    onClick={() => setCurrentView('adminOrders')}
+                    className={`px-4 py-2 rounded-lg transition text-white ${
+                      currentView === 'adminOrders'
+                        ? 'bg-blue-700'
+                        : 'bg-blue-600 hover:bg-blue-500'
+                    }`}
+                  >
+                    Manage Orders
+                  </button>
+                </>
               )}
               {!isAdmin && (
                 <button

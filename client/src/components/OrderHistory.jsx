@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { orderService } from '../services/orderService';
 import { authService } from '../services/authService';
 
@@ -8,11 +8,7 @@ function OrderHistory() {
   const [error, setError] = useState(null);
   const isAdmin = authService.isAdmin();
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     try {
       setLoading(true);
       const data = isAdmin 
@@ -25,7 +21,11 @@ function OrderHistory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   const handleCancelOrder = async (orderId) => {
     if (!confirm('Are you sure you want to cancel this order?')) return;

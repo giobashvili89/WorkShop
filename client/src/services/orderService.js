@@ -67,6 +67,24 @@ class OrderService {
       throw new Error('Failed to cancel order');
     }
   }
+
+  async updateDeliveryInfo(id, deliveryInfo) {
+    const token = authService.getToken();
+    const response = await fetch(`${API_URL}/orders/${id}/delivery`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(deliveryInfo),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Failed to update delivery information');
+    }
+    return response.json();
+  }
 }
 
 export const orderService = new OrderService();

@@ -1,19 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Login from './components/Login';
 import Header from './components/Header';
 import BookList from './components/BookList';
 import AdminBookManagement from './components/AdminBookManagement';
+import AdminOrderManagement from './components/AdminOrderManagement';
 import OrderHistory from './components/OrderHistory';
 import { authService } from './services/authService';
 import './App.css';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
   const [currentView, setCurrentView] = useState('books');
-
-  useEffect(() => {
-    setIsAuthenticated(authService.isAuthenticated());
-  }, []);
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
@@ -41,6 +38,7 @@ function App() {
       <main>
         {currentView === 'books' && <BookList />}
         {currentView === 'admin' && authService.isAdmin() && <AdminBookManagement />}
+        {currentView === 'adminOrders' && authService.isAdmin() && <AdminOrderManagement />}
         {currentView === 'orders' && <OrderHistory />}
       </main>
     </div>
