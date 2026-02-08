@@ -8,6 +8,7 @@ import Footer from './components/Footer';
 import BookList from './components/BookList';
 import AdminBookManagement from './components/AdminBookManagement';
 import AdminOrderManagement from './components/AdminOrderManagement';
+import AdminUserManagement from './components/AdminUserManagement';
 import OrderHistory from './components/OrderHistory';
 import { authService } from './services/authService';
 import './App.css';
@@ -119,6 +120,17 @@ function App() {
             <ProtectedRoute adminOnly={true}>
               <Layout onLogout={handleLogout}>
                 <AdminOrderManagement />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <Layout onLogout={handleLogout}>
+                <AdminUserManagement />
               </Layout>
             </ProtectedRoute>
           }

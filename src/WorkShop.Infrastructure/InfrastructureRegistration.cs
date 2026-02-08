@@ -24,6 +24,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }
