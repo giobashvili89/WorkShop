@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { bookService } from '../services/bookService';
+import { categoryService } from '../services/categoryService';
 
 function AdminBookManagement() {
   const [books, setBooks] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -19,7 +21,7 @@ function AdminBookManagement() {
   const [formData, setFormData] = useState({
     title: '',
     author: '',
-    category: '',
+    categoryId: '',
     description: '',
     isbn: '',
     price: '',
@@ -30,6 +32,7 @@ function AdminBookManagement() {
 
   useEffect(() => {
     loadBooks();
+    loadCategories();
   }, []);
 
   const loadBooks = async () => {
@@ -42,6 +45,15 @@ function AdminBookManagement() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const data = await categoryService.getAllCategories();
+      setCategories(data);
+    } catch (err) {
+      console.error('Failed to load categories:', err);
     }
   };
 
@@ -75,6 +87,7 @@ function AdminBookManagement() {
 
       const bookData = {
         ...formData,
+        categoryId: parseInt(formData.categoryId),
         price: parseFloat(formData.price),
         stockQuantity: parseInt(formData.stockQuantity),
         publishedDate: new Date(formData.publishedDate).toISOString(),
@@ -102,7 +115,7 @@ function AdminBookManagement() {
     setFormData({
       title: book.title,
       author: book.author,
-      category: book.category,
+      categoryId: book.categoryId.toString(),
       description: book.description,
       isbn: book.isbn,
       price: book.price.toString(),
@@ -129,7 +142,7 @@ function AdminBookManagement() {
     setFormData({
       title: '',
       author: '',
-      category: '',
+      categoryId: '',
       description: '',
       isbn: '',
       price: '',
@@ -157,8 +170,8 @@ function AdminBookManagement() {
     setCurrentPage(1);
   };
 
-  // Extract unique categories for filter
-  const categories = ['All', ...new Set(books.map(book => book.category))];
+  // Get unique categories for filter dropdown
+  const filterCategories = ['All', ...new Set(books.map(book => book.categoryName).filter(Boolean))];
 
   // Filter books
   const filteredBooks = books.filter(book => {
@@ -168,7 +181,7 @@ function AdminBookManagement() {
     }
     
     // Category filter
-    if (categoryFilter !== 'All' && book.category !== categoryFilter) {
+    if (categoryFilter !== 'All' && book.categoryName !== categoryFilter) {
       return false;
     }
     
@@ -275,7 +288,7 @@ function AdminBookManagement() {
               }}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {categories.map(category => (
+              {filterCategories.map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
             </select>
@@ -365,13 +378,17 @@ function AdminBookManagement() {
 
               <div>
                 <label className="block text-gray-700 mb-2">Category *</label>
-                <input
-                  type="text"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                <select
+                  value={formData.categoryId}
+                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                />
+                >
+                  <option value="">Select a category</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -542,7 +559,7 @@ function AdminBookManagement() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {book.category}
+                    {book.categoryName}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
