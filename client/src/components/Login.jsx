@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 
-function Login({ onLoginSuccess }) {
+function Login() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -20,7 +22,7 @@ function Login({ onLoginSuccess }) {
       } else {
         await authService.register(username, email, password);
       }
-      onLoginSuccess();
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './components/Login';
 import Header from './components/Header';
 import BookList from './components/BookList';
@@ -8,40 +9,121 @@ import OrderHistory from './components/OrderHistory';
 import { authService } from './services/authService';
 import './App.css';
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
-  const [currentView, setCurrentView] = useState('books');
-
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-    setCurrentView('books');
-  };
-
-  const handleLogout = () => {
-    authService.logout();
-    setIsAuthenticated(false);
-    setCurrentView('books');
-  };
+// Protected Route wrapper
+function ProtectedRoute({ children, adminOnly = false }) {
+  const isAuthenticated = authService.isAuthenticated();
+  const isAdmin = authService.isAdmin();
 
   if (!isAuthenticated) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+    return <Navigate to="/login" replace />;
   }
 
+  if (adminOnly && !isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+// Login page wrapper
+function LoginPage() {
+  const navigate = useNavigate();
+  const isAuthenticated = authService.isAuthenticated();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (isAuthenticated) {
+    return null;
+  }
+
+  return <Login />;
+}
+
+// Main layout wrapper
+function Layout({ children, onLogout }) {
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header 
-        onLogout={handleLogout}
-        currentView={currentView}
-        setCurrentView={setCurrentView}
-      />
-      
-      <main>
-        {currentView === 'books' && <BookList />}
-        {currentView === 'admin' && authService.isAdmin() && <AdminBookManagement />}
-        {currentView === 'adminOrders' && authService.isAdmin() && <AdminOrderManagement />}
-        {currentView === 'orders' && <OrderHistory />}
-      </main>
+      <Header onLogout={onLogout} />
+      <main>{children}</main>
     </div>
+  );
+}
+
+function App() {
+  const handleLogout = () => {
+    authService.logout();
+  };
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Login route */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected routes with layout */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout onLogout={handleLogout}>
+                <BookList />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/books"
+          element={
+            <ProtectedRoute>
+              <Layout onLogout={handleLogout}>
+                <BookList />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Layout onLogout={handleLogout}>
+                <OrderHistory />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/books"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <Layout onLogout={handleLogout}>
+                <AdminBookManagement />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/orders"
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <Layout onLogout={handleLogout}>
+                <AdminOrderManagement />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
