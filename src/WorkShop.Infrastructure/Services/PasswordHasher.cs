@@ -10,40 +10,31 @@ public static class PasswordHasher
 
     public static string HashPassword(string password)
     {
-        // Generate a random salt
         using var rng = RandomNumberGenerator.Create();
         var salt = new byte[SaltSize];
         rng.GetBytes(salt);
 
-        // Hash password with PBKDF2
         var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, HashSize);
 
-        // Combine salt and hash
         var hashBytes = new byte[SaltSize + HashSize];
         Array.Copy(salt, 0, hashBytes, 0, SaltSize);
         Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
 
-        // Convert to base64 for storage
         return Convert.ToBase64String(hashBytes);
     }
 
     public static bool VerifyPassword(string password, string hashedPassword)
     {
-        // Extract the bytes
         var hashBytes = Convert.FromBase64String(hashedPassword);
 
-        // Extract the salt
         var salt = new byte[SaltSize];
         Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
-        // Compute the hash of the provided password
         var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithmName.SHA256, HashSize);
 
-        // Extract the stored hash
         var storedHash = new byte[HashSize];
         Array.Copy(hashBytes, SaltSize, storedHash, 0, HashSize);
 
-        // Use constant-time comparison to prevent timing attacks
         return CryptographicOperations.FixedTimeEquals(hash, storedHash);
     }
 }

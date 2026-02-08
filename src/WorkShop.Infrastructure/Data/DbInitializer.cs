@@ -14,7 +14,7 @@ public static class DbInitializer
         // Check if data already exists (after migrations are applied)
         if (await context.Books.AnyAsync())
         {
-            return; // Database has been seeded
+            return;  
         }
 
         // Seed Books - 100 records
@@ -38,7 +38,7 @@ public static class DbInitializer
         };
 
         var books = new List<Book>();
-        var random = new Random(42); // Fixed seed for reproducibility
+        var random = new Random(42); 
 
         for (int i = 1; i <= 100; i++)
         {
@@ -71,10 +71,6 @@ public static class DbInitializer
 
     private static async Task SeedDefaultUsersAsync(AppDbContext context)
     {
-        // WARNING: Default credentials are hardcoded for development/demo purposes only.
-        // For production, use environment variables or secure configuration.
-        // Consider only running this seeding in development environments.
-        
         // Create default admin user
         // Note: Password validation requires minimum 6 characters, using "admin1" instead of "admin"
         var adminPasswordHash = PasswordHasher.HashPassword("admin1");
