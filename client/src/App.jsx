@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './components/Login';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import Header from './components/Header';
 import BookList from './components/BookList';
 import AdminBookManagement from './components/AdminBookManagement';
@@ -63,6 +65,10 @@ function App() {
       <Routes>
         {/* Login route */}
         <Route path="/login" element={<LoginPage />} />
+        
+        {/* Password recovery routes */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Public routes with layout */}
         <Route

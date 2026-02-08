@@ -76,6 +76,40 @@ class AuthService {
   isAdmin() {
     return this.getRole() === 'Admin';
   }
+
+  async forgotPassword(email) {
+    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Failed to send password reset email');
+    }
+
+    return await response.json();
+  }
+
+  async resetPassword(token, newPassword) {
+    const response = await fetch(`${API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token, newPassword }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Failed to reset password');
+    }
+
+    return await response.json();
+  }
 }
 
 export const authService = new AuthService();
