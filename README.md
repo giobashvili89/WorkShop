@@ -2,6 +2,8 @@
 
 A full-stack book selling application with .NET 10 API (Clean Architecture) and React.js frontend featuring JWT authentication, role-based access control, shopping cart, and PostgreSQL database.
 
+> **⚠️ Database Issues?** If you encounter errors like "relation 'Categories' does not exist", see [DATABASE_TROUBLESHOOTING.md](DATABASE_TROUBLESHOOTING.md)
+
 ## Project Structure
 
 ```
@@ -121,6 +123,13 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
    }
    ```
 
+3. **Database migrations and seeding are automatic!** When you run the API for the first time, it will:
+   - Apply all database migrations automatically
+   - Create all tables (Books, Categories, Users, Orders, OrderItems)
+   - Seed demo data (10 categories, 100 books, 2 demo users)
+   
+   > **Troubleshooting**: If you encounter database errors, see [DATABASE_TROUBLESHOOTING.md](DATABASE_TROUBLESHOOTING.md)
+
 #### Backend (.NET API)
 
 1. Navigate to the repository root:
@@ -141,6 +150,14 @@ JWT_SECRET=your_super_secret_jwt_key_at_least_32_characters_long
    ```
 
    The API will be available at `http://localhost:5000` (or `https://localhost:5001`)
+   
+   Watch the console output for messages like:
+   ```
+   info: Program[0]
+         Starting database initialization...
+   info: Program[0]
+         Database initialization completed successfully.
+   ```
 
 #### Frontend (React)
 

@@ -37,15 +37,25 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
     try
     {
+        logger.LogInformation("Starting database initialization...");
         var context = services.GetRequiredService<AppDbContext>();
         await DbInitializer.InitializeAsync(context);
+        logger.LogInformation("Database initialization completed successfully.");
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while initializing the database.");
+        logger.LogCritical(ex, 
+            "CRITICAL: Database initialization failed! " +
+            "The application may not function correctly. " +
+            "Common causes: " +
+            "1. PostgreSQL is not running " +
+            "2. Connection string is incorrect " +
+            "3. Database permissions are insufficient " +
+            "See DATABASE_TROUBLESHOOTING.md for detailed troubleshooting steps.");
     }
 }
 
