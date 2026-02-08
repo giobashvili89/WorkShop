@@ -4,6 +4,7 @@ import Login from './components/Login';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import BookList from './components/BookList';
 import AdminBookManagement from './components/AdminBookManagement';
 import AdminOrderManagement from './components/AdminOrderManagement';
@@ -48,9 +49,10 @@ function LoginPage() {
 // Main layout wrapper
 function Layout({ children, onLogout }) {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       <Header onLogout={onLogout} />
-      <main>{children}</main>
+      <main className="flex-grow">{children}</main>
+      <Footer />
     </div>
   );
 }
